@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useEditorStore } from '@/store/editorStore';
 import { useSearchStore } from '@/store/searchStore';
@@ -10,23 +10,18 @@ export function LinkedNotesList() {
   const { index } = useSearchStore();
   const router = useRouter();
 
-  const [linked, setLinked] = useState<Array<{ path: string; title: string }>>([]);
-
-  useEffect(() => {
-    if (!activePath) {
-      setLinked([]);
-      return;
-    }
-
-    // 노트 이름 추출 (확장자 제외, 경로 마지막 세그먼트)
+  // useState + useEffect 대신 useMemo로 파생값 계산 — set-state-in-effect 방지
+  const linked = useMemo(() => {
+    if (!activePath) return [];
     const noteName = activePath.split('/').pop()?.replace(/\.md$/, '') ?? '';
-
-    const refs = index.filter((item) => {
-      if (item.path === activePath) return false;
-      return item.body.includes(`[[${noteName}]]`) || item.title.includes(`[[${noteName}]]`);
-    });
-
-    setLinked(refs.map((r) => ({ path: r.path, title: r.title || r.path })));
+    return index
+      .filter(
+        (item) =>
+          item.path !== activePath &&
+          (item.body.includes(`[[${noteName}]]`) || item.title.includes(`[[${noteName}]]`))
+      )
+      .slice(0, 50)
+      .map((r) => ({ path: r.path, title: r.title || r.path }));
   }, [activePath, index]);
 
   if (!activePath || linked.length === 0) return null;
@@ -37,7 +32,7 @@ export function LinkedNotesList() {
         연결 노트 ({linked.length})
       </p>
       <div className="max-h-40 overflow-y-auto">
-        {linked.slice(0, 50).map((n) => (
+        {linked.map((n) => (
           <button
             key={n.path}
             onClick={() => router.push(`/workspace/${btoa(n.path)}`)}

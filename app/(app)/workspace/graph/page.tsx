@@ -34,8 +34,10 @@ function GraphPageContent() {
   const [graphData, setGraphData] = useState<
     (GraphData & { tagColorMap: Record<string, string> }) | null
   >(null);
-  const [isLoading, setIsLoading] = useState(true);
   const [allTags, setAllTags] = useState<string[]>([]);
+  // deps 조합으로 로딩 여부를 파생 → set-state-in-effect 방지
+  const [loadedKey, setLoadedKey] = useState('');
+  const depsKey = `${selectedRepo?.id ?? ''}-${tree.length}`;
 
   useEffect(() => {
     if (!selectedRepo || tree.length === 0) return;
@@ -52,7 +54,7 @@ function GraphPageContent() {
     }
 
     const filePaths = flattenFiles(tree);
-    setIsLoading(true);
+    const key = `${selectedRepo.id}-${tree.length}`;
 
     Promise.all(
       filePaths.map((path) =>
@@ -73,9 +75,12 @@ function GraphPageContent() {
         const graph = buildGraph(valid);
         setGraphData(graph);
         setAllTags([...new Set(valid.flatMap((n) => n.tags))]);
+        setLoadedKey(key); // ← setState in callback, not in effect body
       })
-      .finally(() => setIsLoading(false));
+      .catch(() => setLoadedKey(key)); // 에러 시에도 로딩 해제
   }, [selectedRepo, tree]);
+
+  const isLoading = !!selectedRepo && tree.length > 0 && depsKey !== loadedKey;
 
   if (isLoading) {
     return (

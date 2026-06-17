@@ -28,7 +28,6 @@ export function FolderNode({ node, depth, onCreateNote, onCreateFolder }: Folder
 
   const [menu, setMenu] = useState<{ x: number; y: number } | null>(null);
   const [modal, setModal] = useState<'rename' | 'delete' | null>(null);
-  const [isDropTarget, setIsDropTarget] = useState(false);
   const hoverTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const { attributes, listeners, setNodeRef, transform, transition, isDragging, isOver } =
@@ -38,13 +37,10 @@ export function FolderNode({ node, depth, onCreateNote, onCreateFolder }: Folder
 
   useEffect(() => {
     if (isOver && !isExpanded) {
-      hoverTimer.current = setTimeout(() => {
-        toggleExpand(node.path);
-      }, HOVER_OPEN_DELAY);
+      hoverTimer.current = setTimeout(() => toggleExpand(node.path), HOVER_OPEN_DELAY);
     } else {
       if (hoverTimer.current) clearTimeout(hoverTimer.current);
     }
-    setIsDropTarget(isOver);
   }, [isOver, isExpanded, node.path, toggleExpand]);
 
   const style = {
@@ -136,7 +132,7 @@ export function FolderNode({ node, depth, onCreateNote, onCreateFolder }: Folder
         <div
           style={{ paddingLeft: `${depth * 12 + 8}px` }}
           className={`group flex cursor-pointer items-center gap-1.5 rounded-md py-1 pr-2 text-sm select-none ${
-            isDropTarget ? 'bg-green-50 ring-1 ring-green-400' : 'text-gray-700 hover:bg-gray-100'
+            isOver ? 'bg-green-50 ring-1 ring-green-400' : 'text-gray-700 hover:bg-gray-100'
           }`}
           onClick={() => toggleExpand(node.path)}
           onContextMenu={handleRightClick}

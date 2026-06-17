@@ -45,9 +45,7 @@ export function SearchResults() {
               onClick={() => handleClick(r.path)}
               className="w-full border-b border-gray-50 px-3 py-2 text-left hover:bg-gray-50"
             >
-              <p className="truncate text-xs font-medium text-gray-800">
-                {highlight(r.title, query)}
-              </p>
+              <p className="truncate text-xs font-medium text-gray-800">{highlight(r.title)}</p>
               {r.snippet && (
                 <p className="mt-0.5 truncate text-[10px] text-gray-400">{r.snippet}</p>
               )}
@@ -71,8 +69,6 @@ export function SearchResults() {
   );
 }
 
-function highlight(text: string, query: string): string {
-  // plain string이라 JSX 하이라이트 대신 텍스트 그대로 반환
-  // 실제 하이라이트는 dangerouslySetInnerHTML 없이 처리
+function highlight(text: string): string {
   return text;
 }

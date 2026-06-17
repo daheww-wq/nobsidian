@@ -40,7 +40,6 @@ export function buildGraph(notes: NoteInfo[]): GraphData & { tagColorMap: Record
     });
   }
 
-  const pathIndex = new Map(notes.map((n) => [n.path, n]));
   const nameIndex = new Map(notes.map((n) => [n.title.toLowerCase(), n.path]));
   const filenameIndex = new Map(
     notes.map((n) => [n.path.split('/').pop()?.replace(/\.md$/, '').toLowerCase() ?? '', n.path])

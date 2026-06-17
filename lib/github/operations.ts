@@ -11,6 +11,7 @@ interface PutFileOptions extends GetFileOptions {
   content: string; // utf-8 string (will be base64-encoded)
   message: string;
   sha?: string; // required for updates
+  branch?: string;
 }
 
 export async function getFile({ token, owner, repo, path }: GetFileOptions) {
@@ -20,7 +21,16 @@ export async function getFile({ token, owner, repo, path }: GetFileOptions) {
   return data as { content: string; sha: string; encoding: string };
 }
 
-export async function putFile({ token, owner, repo, path, content, message, sha }: PutFileOptions) {
+export async function putFile({
+  token,
+  owner,
+  repo,
+  path,
+  content,
+  message,
+  sha,
+  branch,
+}: PutFileOptions) {
   const octokit = createOctokit(token);
   const encoded = Buffer.from(content, 'utf-8').toString('base64');
   const { data } = await octokit.repos.createOrUpdateFileContents({
@@ -30,6 +40,7 @@ export async function putFile({ token, owner, repo, path, content, message, sha 
     message,
     content: encoded,
     sha,
+    ...(branch ? { branch } : {}),
   });
   return data;
 }
@@ -79,6 +90,7 @@ export async function initNotegraphConfig(
       path,
       content: JSON.stringify(config, null, 2),
       message: '[dohohon] init config',
+      branch,
     });
   }
 }

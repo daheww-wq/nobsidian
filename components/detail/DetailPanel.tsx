@@ -1,23 +1,14 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { useEditorStore } from '@/store/editorStore';
-import { useRepoStore } from '@/store/repoStore';
 import { useFileTreeStore } from '@/store/fileTreeStore';
 import { toast } from '@/components/ui/Toast';
-import { serializeFrontmatter } from '@/lib/markdown/frontmatter';
 import { extractBacklinks } from '@/lib/markdown/backlinks';
 
 export function DetailPanel() {
-  const {
-    isDetailPanelOpen,
-    frontmatter,
-    markdownBody,
-    activePath,
-    updateFrontmatter,
-    setSaveStatus,
-  } = useEditorStore();
-  const { selectedRepo } = useRepoStore();
+  const { isDetailPanelOpen, frontmatter, markdownBody, activePath, updateFrontmatter } =
+    useEditorStore();
   const { tree } = useFileTreeStore();
 
   const [isSummarizing, setIsSummarizing] = useState(false);

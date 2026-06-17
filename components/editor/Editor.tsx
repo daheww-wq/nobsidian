@@ -34,6 +34,9 @@ export function Editor() {
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [isOnline, setIsOnline] = useState(true);
   const saveQueueRef = useRef<SaveQueue | null>(null);
+  // triggerSave self-reference를 ref로 보관 — useCallback 내부에서 자기 자신을 참조할 때
+  // no-use-before-define 가능성 없이 최신 버전을 클로저로 캡처
+  const triggerSaveRef = useRef<((isManual: boolean) => Promise<void>) | null>(null);
 
   const forceOverwrite = useCallback(
     async (content: string) => {
@@ -66,7 +69,6 @@ export function Editor() {
       const content = serializeFrontmatter(frontmatter, markdownBody);
       const owner = selectedRepo.full_name.split('/')[0];
 
-      // 수동 저장은 큐 flush
       if (isManual) saveQueueRef.current?.flush();
 
       try {
@@ -98,7 +100,12 @@ export function Editor() {
         setSaveStatus('saved');
       } catch {
         setSaveStatus('error');
-        toast({ type: 'error', message: '저장에 실패했습니다. Cmd+S로 재시도하세요.' });
+        // triggerSaveRef를 통해 최신 triggerSave 참조 — 재시도 버튼 복원
+        toast({
+          type: 'error',
+          message: '저장에 실패했습니다.',
+          action: { label: '재시도', onClick: () => triggerSaveRef.current?.(isManual) },
+        });
       }
     },
     [
@@ -114,10 +121,14 @@ export function Editor() {
     ]
   );
 
-  // 배치 저장 큐 초기화 (활성 노트 변경 시 재생성)
+  // triggerSaveRef를 항상 최신 triggerSave로 유지
+  useEffect(() => {
+    triggerSaveRef.current = triggerSave;
+  }, [triggerSave]);
+
+  // 배치 저장 큐 초기화
   useEffect(() => {
     const queue = new SaveQueue(async (items) => {
-      // 같은 경로의 마지막 항목만 실제로 저장
       const last = items[items.length - 1];
       if (last) await triggerSave(last.isManual);
     });

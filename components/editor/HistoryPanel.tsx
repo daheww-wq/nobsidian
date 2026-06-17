@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useEditorStore } from '@/store/editorStore';
 import { useRepoStore } from '@/store/repoStore';
 import { toast } from '@/components/ui/Toast';
@@ -30,39 +30,42 @@ function getSaveType(message: string) {
 }
 
 export function HistoryPanel() {
-  const { activePath, toggleHistory, setActiveNote, activeSha } = useEditorStore();
+  const { activePath, toggleHistory, activeSha } = useEditorStore();
   const { selectedRepo } = useRepoStore();
   const [commits, setCommits] = useState<Commit[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  // 어떤 경로의 커밋을 로드했는지 추적 → 파생 로딩 상태 (set-state-in-effect 방지)
+  const [commitsFor, setCommitsFor] = useState<string | null>(null);
   const [selected, setSelected] = useState<Commit | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
+
+  const isLoading = activePath !== commitsFor;
 
   useEffect(() => {
     if (!activePath || !selectedRepo) return;
     const owner = selectedRepo.full_name.split('/')[0];
-    setIsLoading(true);
+    let cancelled = false;
+
     fetch(
       `/api/notes/history?owner=${owner}&repo=${selectedRepo.name}&path=${encodeURIComponent(activePath)}`
     )
       .then((r) => r.json())
-      .then((d: { commits: Commit[] }) => setCommits(d.commits))
-      .finally(() => setIsLoading(false));
+      .then((d: { commits: Commit[] }) => {
+        if (cancelled) return;
+        setCommits(d.commits);
+        setCommitsFor(activePath); // ← setState in callback, not in effect body
+      })
+      .catch(() => {
+        if (!cancelled) setCommitsFor(activePath); // 에러 시에도 로딩 해제
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, [activePath, selectedRepo]);
 
-  const handleSelect = async (commit: Commit) => {
+  const handleSelect = (commit: Commit) => {
     setSelected(commit);
-    if (!activePath || !selectedRepo) return;
-    const owner = selectedRepo.full_name.split('/')[0];
-    try {
-      const res = await fetch(
-        `/api/notes/get?owner=${owner}&repo=${selectedRepo.name}&path=${encodeURIComponent(activePath)}`
-      );
-      // Actually fetch the commit's content via restore preview...
-      // For now show the commit message as preview
-      setPreview(`커밋: ${commit.message}\n시간: ${new Date(commit.date).toLocaleString('ko-KR')}`);
-    } catch {
-      setPreview(null);
-    }
+    setPreview(`커밋: ${commit.message}\n시간: ${new Date(commit.date).toLocaleString('ko-KR')}`);
   };
 
   const handleRestore = async (commit: Commit) => {

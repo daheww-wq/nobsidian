@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { forwardRef, useCallback, useImperativeHandle, useState } from 'react';
 import {
   DndContext,
   closestCenter,
@@ -22,12 +22,13 @@ import type { FileTreeNode } from '@/types/note';
 
 const INVALID_CHARS = /[<>:"/\\|?*\x00-\x1F]/;
 
-interface FileTreeProps {
-  createSignal?: { type: 'note' | 'folder' } | null;
-  onCreateSignalConsumed?: () => void;
+// forwardRef + useImperativeHandle로 부모가 직접 모달을 열도록 위임
+// useEffect를 통한 prop→state 동기화 패턴(set-state-in-effect) 제거
+export interface FileTreeHandle {
+  openCreate: (type: 'note' | 'folder') => void;
 }
 
-export function FileTree({ createSignal, onCreateSignalConsumed }: FileTreeProps) {
+export const FileTree = forwardRef<FileTreeHandle>(function FileTree(_props, ref) {
   const { tree, isLoading, addNode } = useFileTreeStore();
   const { selectedRepo } = useRepoStore();
 
@@ -36,13 +37,9 @@ export function FileTree({ createSignal, onCreateSignalConsumed }: FileTreeProps
     parentPath: string | null;
   } | null>(null);
 
-  // 툴바에서 전달된 신호로 루트 레벨 생성 모달 열기
-  useEffect(() => {
-    if (createSignal) {
-      setCreateModal({ type: createSignal.type, parentPath: null });
-      onCreateSignalConsumed?.();
-    }
-  }, [createSignal, onCreateSignalConsumed]);
+  useImperativeHandle(ref, () => ({
+    openCreate: (type) => setCreateModal({ type, parentPath: null }),
+  }));
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }));
 
@@ -56,14 +53,12 @@ export function FileTree({ createSignal, onCreateSignalConsumed }: FileTreeProps
       const srcPath = active.id as string;
       const dstPath = over.id as string;
 
-      // If dst is a folder, move into it; else reorder (not persisted in v1)
       const dstNode = findNode(tree, dstPath);
       if (dstNode?.type !== 'folder') return;
 
       const srcNode = findNode(tree, srcPath);
       if (!srcNode) return;
 
-      // Prevent dropping folder into its own subtree
       if (dstPath.startsWith(srcPath + '/')) {
         toast({ type: 'error', message: '폴더를 자신의 하위로 이동할 수 없습니다.' });
         return;
@@ -86,7 +81,6 @@ export function FileTree({ createSignal, onCreateSignalConsumed }: FileTreeProps
         });
         if (!res.ok) throw new Error();
       } catch {
-        // rollback
         useFileTreeStore.getState().removeNode(newPath);
         addNode(srcNode, null);
         toast({ type: 'error', message: '이동에 실패했습니다.' });
@@ -205,7 +199,7 @@ export function FileTree({ createSignal, onCreateSignalConsumed }: FileTreeProps
       )}
     </>
   );
-}
+});
 
 function flattenIds(node: FileTreeNode): string[] {
   if (node.type === 'file') return [node.path];

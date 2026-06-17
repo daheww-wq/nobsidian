@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useRepoStore } from '@/store/repoStore';
 import { useAuthStore } from '@/store/authStore';
@@ -16,29 +16,38 @@ export default function SelectRepoPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selecting, setSelecting] = useState<number | null>(null);
+  // 재시도 트리거: 값이 바뀌면 useEffect가 재실행
+  const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
     fetchSession();
   }, [fetchSession]);
 
-  const loadRepos = useCallback(async () => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const res = await fetch('/api/repos');
-      if (!res.ok) throw new Error('레포지토리 목록을 불러올 수 없습니다.');
-      const data = (await res.json()) as { repos: GitHubRepo[] };
-      setRepos(data.repos);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : '알 수 없는 오류');
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
   useEffect(() => {
-    loadRepos();
-  }, [loadRepos]);
+    let cancelled = false;
+
+    fetch('/api/repos')
+      .then((r) => {
+        if (!r.ok) throw new Error('레포지토리 목록을 불러올 수 없습니다.');
+        return r.json();
+      })
+      .then((data: { repos: GitHubRepo[] }) => {
+        if (!cancelled) {
+          setRepos(data.repos);
+          setIsLoading(false); // ← async 콜백 내에서만 호출
+        }
+      })
+      .catch((e: unknown) => {
+        if (!cancelled) {
+          setError(e instanceof Error ? e.message : '알 수 없는 오류');
+          setIsLoading(false);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [retryCount]); // retryCount 변경 시 재실행
 
   const handleSelect = async (repo: GitHubRepo) => {
     setSelecting(repo.id);
@@ -115,7 +124,14 @@ export default function SelectRepoPage() {
         ) : error ? (
           <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
             {error}
-            <button onClick={loadRepos} className="ml-2 underline">
+            <button
+              onClick={() => {
+                setIsLoading(true);
+                setError(null);
+                setRetryCount((c) => c + 1);
+              }}
+              className="ml-2 underline"
+            >
               다시 시도
             </button>
           </div>

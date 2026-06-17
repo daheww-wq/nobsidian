@@ -54,7 +54,7 @@ export default function WorkspaceLayout({ children }: { children: React.ReactNod
       })
       .catch(() => {})
       .finally(() => setLoading(false));
-  }, [selectedRepo]);
+  }, [selectedRepo, router, setLoading, setTree, addToIndex]);
 
   return (
     <div className="flex h-screen flex-col overflow-hidden">
