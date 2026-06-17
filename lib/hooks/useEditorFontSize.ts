@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 const KEY = 'editor-font-size';
-const DEFAULT = 13;
+const DEFAULT = 10;
 const MIN = 10;
 const MAX = 20;
 

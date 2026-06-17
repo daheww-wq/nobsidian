@@ -27,13 +27,13 @@ body {
 
 /* BlockNote editor: 기본 글씨 크기 및 헤딩 스타일 오버라이드 */
 .bn-editor {
-  font-size: var(--editor-font-size, 13px) !important;
+  font-size: var(--editor-font-size, 10px) !important;
 }
 
 .bn-editor .bn-block-content,
 .bn-editor p,
 .bn-editor li {
-  font-size: var(--editor-font-size, 13px) !important;
+  font-size: var(--editor-font-size, 10px) !important;
   line-height: 1.65 !important;
 }
 
@@ -41,7 +41,7 @@ body {
 .bn-editor h1,
 .bn-editor h2,
 .bn-editor h3 {
-  font-size: var(--editor-font-size, 13px) !important;
+  font-size: var(--editor-font-size, 10px) !important;
   font-weight: 700 !important;
   line-height: 1.65 !important;
   margin-top: 0 !important;
