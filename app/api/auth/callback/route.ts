@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+const stripBOM = (s: string) => s.replace(/^﻿/, '');
+
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const code = searchParams.get('code');
@@ -18,8 +20,8 @@ export async function GET(request: NextRequest) {
       Accept: 'application/json',
     },
     body: JSON.stringify({
-      client_id: process.env.GITHUB_CLIENT_ID,
-      client_secret: process.env.GITHUB_CLIENT_SECRET,
+      client_id: stripBOM(process.env.GITHUB_CLIENT_ID ?? ''),
+      client_secret: stripBOM(process.env.GITHUB_CLIENT_SECRET ?? ''),
       code,
     }),
   });
