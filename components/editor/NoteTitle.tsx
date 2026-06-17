@@ -23,7 +23,8 @@ export function NoteTitle({ value, onChange }: NoteTitleProps) {
       suppressContentEditableWarning
       onInput={(e) => onChange(e.currentTarget.textContent ?? '')}
       onKeyDown={(e) => e.key === 'Enter' && e.preventDefault()}
-      className="mb-4 min-h-[2.5rem] w-full text-3xl font-bold text-gray-900 outline-none empty:before:text-gray-300 empty:before:content-['제목_없음']"
+      className="mb-2 w-full font-bold text-gray-700 outline-none empty:before:text-gray-300 empty:before:content-['제목_없음']"
+      style={{ fontSize: 'calc(var(--editor-font-size, 12px) + 1px)' }}
     />
   );
 }
