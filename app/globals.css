@@ -47,3 +47,24 @@ body {
   margin-top: 0 !important;
   margin-bottom: 0 !important;
 }
+
+/* 코드블록·인라인 코드 흰 배경 */
+.bn-editor code,
+.bn-editor pre,
+.bn-editor [data-content-type='codeBlock'],
+.bn-editor .bn-code-block {
+  background-color: #fff !important;
+  border: 1px solid #e5e7eb !important;
+  color: #374151 !important;
+}
+
+.bn-editor code {
+  border-radius: 3px !important;
+  padding: 1px 4px !important;
+}
+
+.bn-editor pre,
+.bn-editor [data-content-type='codeBlock'] {
+  border-radius: 6px !important;
+  padding: 10px 14px !important;
+}

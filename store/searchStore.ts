@@ -14,6 +14,7 @@ interface SearchStore {
   setSortBy: (s: 'relevance' | 'date') => void;
   setActive: (v: boolean) => void;
   clearQuery: () => void;
+  clearIndex: () => void;
 }
 
 export const useSearchStore = create<SearchStore>((set) => ({
@@ -51,4 +52,6 @@ export const useSearchStore = create<SearchStore>((set) => ({
   clearQuery: () => {
     set((s) => ({ query: '', results: searchIndex(s.index, '', s.sortBy) }));
   },
+
+  clearIndex: () => set({ index: [], query: '', results: [], isActive: false }),
 }));

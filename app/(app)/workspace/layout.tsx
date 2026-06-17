@@ -1,10 +1,11 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 import { useRepoStore } from '@/store/repoStore';
 import { useFileTreeStore } from '@/store/fileTreeStore';
+import { useEditorStore } from '@/store/editorStore';
 import { Header } from '@/components/layout/Header';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { StatusBar } from '@/components/layout/StatusBar';
@@ -12,6 +13,7 @@ import { DetailPanel } from '@/components/detail/DetailPanel';
 import { GraphPanel } from '@/components/graph/GraphPanel';
 import { ToastContainer } from '@/components/ui/Toast';
 import { useSearchStore } from '@/store/searchStore';
+import { noteCache } from '@/lib/cache/noteCache';
 import type { FileTreeNode } from '@/types/note';
 
 export default function WorkspaceLayout({ children }: { children: React.ReactNode }) {
@@ -19,7 +21,10 @@ export default function WorkspaceLayout({ children }: { children: React.ReactNod
   const { fetchSession } = useAuthStore();
   const { selectedRepo } = useRepoStore();
   const { setTree, setLoading } = useFileTreeStore();
-  const { addToIndex } = useSearchStore();
+  const { addToIndex, clearIndex } = useSearchStore();
+  const { clearEditor } = useEditorStore();
+  // 최초 마운트는 초기화 건너뜀 — 레포 변경 시에만 초기화
+  const prevRepoRef = useRef<string | null>(null);
 
   useEffect(() => {
     fetchSession();
@@ -31,6 +36,15 @@ export default function WorkspaceLayout({ children }: { children: React.ReactNod
       return;
     }
 
+    // 레포가 바뀌었을 때만 에디터·캐시·검색 초기화
+    const repoKey = selectedRepo.full_name;
+    if (prevRepoRef.current !== null && prevRepoRef.current !== repoKey) {
+      clearEditor();
+      clearIndex();
+      noteCache.clearAll();
+    }
+    prevRepoRef.current = repoKey;
+
     const owner = selectedRepo.full_name.split('/')[0];
     setLoading(true);
 
@@ -40,7 +54,6 @@ export default function WorkspaceLayout({ children }: { children: React.ReactNod
       .then((r) => r.json())
       .then((d: { tree: FileTreeNode[] }) => {
         setTree(d.tree);
-        // 파일 경로 기반 기본 인덱스 (제목은 파일명, 본문은 나중에 채워짐)
         function indexFiles(nodes: FileTreeNode[]) {
           for (const n of nodes) {
             if (n.type === 'file') {
@@ -55,7 +68,7 @@ export default function WorkspaceLayout({ children }: { children: React.ReactNod
       })
       .catch(() => {})
       .finally(() => setLoading(false));
-  }, [selectedRepo, router, setLoading, setTree, addToIndex]);
+  }, [selectedRepo, router, setLoading, setTree, addToIndex, clearEditor, clearIndex]);
 
   return (
     <div className="flex h-screen flex-col overflow-hidden">

@@ -31,4 +31,8 @@ export const noteCache = {
   invalidate(path: string) {
     cache.delete(path);
   },
+
+  clearAll() {
+    cache.clear();
+  },
 };
