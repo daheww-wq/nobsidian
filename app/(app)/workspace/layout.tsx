@@ -10,14 +10,15 @@ import { Sidebar } from '@/components/layout/Sidebar';
 import { StatusBar } from '@/components/layout/StatusBar';
 import { DetailPanel } from '@/components/detail/DetailPanel';
 import { ToastContainer } from '@/components/ui/Toast';
-import { buildFileTree } from '@/lib/github/fileTree';
-import type { GitHubTreeItem } from '@/types/github';
+import { useSearchStore } from '@/store/searchStore';
+import type { FileTreeNode } from '@/types/note';
 
 export default function WorkspaceLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const { fetchSession } = useAuthStore();
   const { selectedRepo } = useRepoStore();
   const { setTree, setLoading } = useFileTreeStore();
+  const { addToIndex } = useSearchStore();
 
   useEffect(() => {
     fetchSession();
@@ -36,7 +37,21 @@ export default function WorkspaceLayout({ children }: { children: React.ReactNod
       `/api/repos/tree?owner=${owner}&repo=${selectedRepo.name}&branch=${selectedRepo.default_branch}`
     )
       .then((r) => r.json())
-      .then((d: { tree: import('@/types/note').FileTreeNode[] }) => setTree(d.tree))
+      .then((d: { tree: FileTreeNode[] }) => {
+        setTree(d.tree);
+        // 파일 경로 기반 기본 인덱스 (제목은 파일명, 본문은 나중에 채워짐)
+        function indexFiles(nodes: FileTreeNode[]) {
+          for (const n of nodes) {
+            if (n.type === 'file') {
+              const title = n.name.replace(/\.md$/, '');
+              addToIndex({ path: n.path, title, tags: [], body: '', updatedAt: '' });
+            } else if (n.children) {
+              indexFiles(n.children);
+            }
+          }
+        }
+        indexFiles(d.tree);
+      })
       .catch(() => {})
       .finally(() => setLoading(false));
   }, [selectedRepo]);

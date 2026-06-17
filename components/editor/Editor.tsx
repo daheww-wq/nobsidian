@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic';
 import { useEditorStore } from '@/store/editorStore';
 import { useRepoStore } from '@/store/repoStore';
 import { serializeFrontmatter } from '@/lib/markdown/frontmatter';
+import { SaveQueue } from '@/lib/editor/saveQueue';
 import { toast } from '@/components/ui/Toast';
 import { EditorSkeleton } from '@/components/ui/Skeleton';
 import { NoteTitle } from './NoteTitle';
@@ -32,6 +33,7 @@ export function Editor() {
   const { selectedRepo } = useRepoStore();
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [isOnline, setIsOnline] = useState(true);
+  const saveQueueRef = useRef<SaveQueue | null>(null);
 
   const forceOverwrite = useCallback(
     async (content: string) => {
@@ -63,6 +65,9 @@ export function Editor() {
       setSaveStatus('saving');
       const content = serializeFrontmatter(frontmatter, markdownBody);
       const owner = selectedRepo.full_name.split('/')[0];
+
+      // 수동 저장은 큐 flush
+      if (isManual) saveQueueRef.current?.flush();
 
       try {
         const res = await fetch('/api/notes/save', {
@@ -109,7 +114,18 @@ export function Editor() {
     ]
   );
 
-  // Online/offline detection
+  // 배치 저장 큐 초기화 (활성 노트 변경 시 재생성)
+  useEffect(() => {
+    const queue = new SaveQueue(async (items) => {
+      // 같은 경로의 마지막 항목만 실제로 저장
+      const last = items[items.length - 1];
+      if (last) await triggerSave(last.isManual);
+    });
+    saveQueueRef.current = queue;
+    return () => queue.destroy();
+  }, [activePath, triggerSave]);
+
+  // Online/offline 감지
   useEffect(() => {
     const onOnline = () => {
       setIsOnline(true);
@@ -127,7 +143,7 @@ export function Editor() {
     };
   }, [saveStatus, triggerSave, setSaveStatus]);
 
-  // beforeunload warning
+  // beforeunload 경고
   useEffect(() => {
     const handler = (e: BeforeUnloadEvent) => {
       if (saveStatus === 'unsaved') {
@@ -139,7 +155,7 @@ export function Editor() {
     return () => window.removeEventListener('beforeunload', handler);
   }, [saveStatus]);
 
-  // Cmd/Ctrl+S manual save
+  // Cmd/Ctrl+S 수동 저장
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 's') {
@@ -154,19 +170,24 @@ export function Editor() {
   const handleBodyChange = useCallback(
     (markdown: string) => {
       setMarkdownBody(markdown);
+      setSaveStatus('unsaved');
       if (saveTimer.current) clearTimeout(saveTimer.current);
-      saveTimer.current = setTimeout(() => triggerSave(false), AUTOSAVE_DELAY);
+      saveTimer.current = setTimeout(() => {
+        if (activePath) saveQueueRef.current?.push(activePath, markdown, false);
+        triggerSave(false);
+      }, AUTOSAVE_DELAY);
     },
-    [setMarkdownBody, triggerSave]
+    [setMarkdownBody, setSaveStatus, triggerSave, activePath]
   );
 
   const handleTitleChange = useCallback(
     (title: string) => {
       updateFrontmatter({ title });
+      setSaveStatus('unsaved');
       if (saveTimer.current) clearTimeout(saveTimer.current);
       saveTimer.current = setTimeout(() => triggerSave(false), AUTOSAVE_DELAY);
     },
-    [updateFrontmatter, triggerSave]
+    [updateFrontmatter, setSaveStatus, triggerSave]
   );
 
   if (!activePath || !frontmatter) {

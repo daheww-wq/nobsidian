@@ -70,14 +70,22 @@ export const useFileTreeStore = create<FileTreeState>((set) => ({
   toggleExpand: (path) =>
     set((s) => {
       const next = new Set(s.expandedPaths);
-      next.has(path) ? next.delete(path) : next.add(path);
+      if (next.has(path)) {
+        next.delete(path);
+      } else {
+        next.add(path);
+      }
       return { expandedPaths: next };
     }),
 
   setExpanded: (path, expanded) =>
     set((s) => {
       const next = new Set(s.expandedPaths);
-      expanded ? next.add(path) : next.delete(path);
+      if (expanded) {
+        next.add(path);
+      } else {
+        next.delete(path);
+      }
       return { expandedPaths: next };
     }),
 

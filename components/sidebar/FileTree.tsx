@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   DndContext,
   closestCenter,
@@ -22,7 +22,12 @@ import type { FileTreeNode } from '@/types/note';
 
 const INVALID_CHARS = /[<>:"/\\|?*\x00-\x1F]/;
 
-export function FileTree() {
+interface FileTreeProps {
+  createSignal?: { type: 'note' | 'folder' } | null;
+  onCreateSignalConsumed?: () => void;
+}
+
+export function FileTree({ createSignal, onCreateSignalConsumed }: FileTreeProps) {
   const { tree, isLoading, addNode } = useFileTreeStore();
   const { selectedRepo } = useRepoStore();
 
@@ -30,6 +35,14 @@ export function FileTree() {
     type: 'note' | 'folder';
     parentPath: string | null;
   } | null>(null);
+
+  // 툴바에서 전달된 신호로 루트 레벨 생성 모달 열기
+  useEffect(() => {
+    if (createSignal) {
+      setCreateModal({ type: createSignal.type, parentPath: null });
+      onCreateSignalConsumed?.();
+    }
+  }, [createSignal, onCreateSignalConsumed]);
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }));
 
@@ -192,10 +205,6 @@ export function FileTree() {
       )}
     </>
   );
-
-  function setCreateModalFromToolbar(type: 'note' | 'folder') {
-    setCreateModal({ type, parentPath: null });
-  }
 }
 
 function flattenIds(node: FileTreeNode): string[] {
