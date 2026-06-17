@@ -9,6 +9,7 @@ import { Header } from '@/components/layout/Header';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { StatusBar } from '@/components/layout/StatusBar';
 import { DetailPanel } from '@/components/detail/DetailPanel';
+import { GraphPanel } from '@/components/graph/GraphPanel';
 import { ToastContainer } from '@/components/ui/Toast';
 import { useSearchStore } from '@/store/searchStore';
 import type { FileTreeNode } from '@/types/note';
@@ -64,6 +65,7 @@ export default function WorkspaceLayout({ children }: { children: React.ReactNod
         <main data-testid="editor-area" className="flex flex-1 flex-col overflow-hidden">
           {children}
         </main>
+        <GraphPanel />
         <DetailPanel />
       </div>
       <StatusBar />

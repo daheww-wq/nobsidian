@@ -10,7 +10,8 @@ export function Header() {
   const router = useRouter();
   const { user, logout } = useAuthStore();
   const { selectedRepo, clearRepo } = useRepoStore();
-  const { isDetailPanelOpen, toggleDetailPanel } = useEditorStore();
+  const { isDetailPanelOpen, toggleDetailPanel, isGraphPanelOpen, toggleGraphPanel } =
+    useEditorStore();
 
   const handleLogout = async () => {
     await logout();
@@ -47,14 +48,14 @@ export function Header() {
           ☰
         </button>
 
-        {/* Graph link (v2) */}
-        <Link
-          href="/workspace/graph"
-          className="rounded-md px-2 py-1.5 text-sm text-gray-500 hover:bg-gray-100"
+        {/* Graph panel toggle */}
+        <button
+          onClick={toggleGraphPanel}
           title="지식 그래프"
+          className={`rounded-md px-2 py-1.5 text-sm ${isGraphPanelOpen ? 'bg-gray-100 text-gray-700' : 'text-gray-500 hover:bg-gray-100'}`}
         >
           ⬡
-        </Link>
+        </button>
 
         {user && (
           <div className="flex items-center gap-2 border-l border-gray-200 pl-2">

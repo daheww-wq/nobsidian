@@ -11,6 +11,7 @@ interface EditorState {
   saveStatus: SaveStatus;
   isDetailPanelOpen: boolean;
   isHistoryOpen: boolean;
+  isGraphPanelOpen: boolean;
   restoreKey: number;
 
   setActiveNote: (path: string, sha: string, fm: NoteFrontmatter, body: string) => void;
@@ -21,6 +22,7 @@ interface EditorState {
   updateFrontmatter: (fm: Partial<NoteFrontmatter>) => void;
   toggleDetailPanel: () => void;
   toggleHistory: () => void;
+  toggleGraphPanel: () => void;
   clearEditor: () => void;
 }
 
@@ -32,6 +34,7 @@ export const useEditorStore = create<EditorState>((set) => ({
   saveStatus: 'saved',
   isDetailPanelOpen: false,
   isHistoryOpen: false,
+  isGraphPanelOpen: false,
   restoreKey: 0,
 
   setActiveNote: (path, sha, fm, body) =>
@@ -67,6 +70,8 @@ export const useEditorStore = create<EditorState>((set) => ({
   toggleDetailPanel: () => set((s) => ({ isDetailPanelOpen: !s.isDetailPanelOpen })),
 
   toggleHistory: () => set((s) => ({ isHistoryOpen: !s.isHistoryOpen })),
+
+  toggleGraphPanel: () => set((s) => ({ isGraphPanelOpen: !s.isGraphPanelOpen })),
 
   clearEditor: () =>
     set({

@@ -1,86 +1,22 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import { useEffect, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { useRepoStore } from '@/store/repoStore';
-import { useFileTreeStore } from '@/store/fileTreeStore';
-import { parseFrontmatter } from '@/lib/markdown/frontmatter';
-import { buildGraph } from '@/lib/graph/buildGraph';
-import type { GraphData } from '@/types/graph';
+import { useGraphData } from '@/lib/hooks/useGraphData';
 
 const KnowledgeGraph = dynamic(
   () => import('@/components/graph/KnowledgeGraph').then((m) => m.KnowledgeGraph),
   { ssr: false }
 );
 
-interface NoteData {
-  path: string;
-  title: string;
-  tags: string[];
-  content: string;
-}
-
 function GraphPageContent() {
   const searchParams = useSearchParams();
   const filterTag = searchParams.get('tag') ?? undefined;
   const focusNote = searchParams.get('note') ? atob(searchParams.get('note')!) : undefined;
 
-  const { selectedRepo } = useRepoStore();
-  const { tree } = useFileTreeStore();
-
-  const [graphData, setGraphData] = useState<
-    (GraphData & { tagColorMap: Record<string, string> }) | null
-  >(null);
-  const [allTags, setAllTags] = useState<string[]>([]);
-  // deps 조합으로 로딩 여부를 파생 → set-state-in-effect 방지
-  const [loadedKey, setLoadedKey] = useState('');
-  const depsKey = `${selectedRepo?.id ?? ''}-${tree.length}`;
-
-  useEffect(() => {
-    if (!selectedRepo || tree.length === 0) return;
-
-    const owner = selectedRepo.full_name.split('/')[0];
-
-    function flattenFiles(nodes: typeof tree): string[] {
-      const paths: string[] = [];
-      for (const n of nodes) {
-        if (n.type === 'file') paths.push(n.path);
-        else if (n.children) paths.push(...flattenFiles(n.children));
-      }
-      return paths;
-    }
-
-    const filePaths = flattenFiles(tree);
-    const key = `${selectedRepo.id}-${tree.length}`;
-
-    Promise.all(
-      filePaths.map((path) =>
-        fetch(
-          `/api/notes/get?owner=${owner}&repo=${selectedRepo.name}&path=${encodeURIComponent(path)}`
-        )
-          .then((r) => (r.ok ? r.json() : null))
-          .then((d: { content: string; sha: string } | null): NoteData | null => {
-            if (!d) return null;
-            const { frontmatter, body } = parseFrontmatter(d.content);
-            return { path, title: frontmatter.title, tags: frontmatter.tags, content: body };
-          })
-          .catch(() => null)
-      )
-    )
-      .then((notes) => {
-        const valid = notes.filter(Boolean) as NoteData[];
-        const graph = buildGraph(valid);
-        setGraphData(graph);
-        setAllTags([...new Set(valid.flatMap((n) => n.tags))]);
-        setLoadedKey(key); // ← setState in callback, not in effect body
-      })
-      .catch(() => setLoadedKey(key)); // 에러 시에도 로딩 해제
-  }, [selectedRepo, tree]);
-
-  const isLoading = !!selectedRepo && tree.length > 0 && depsKey !== loadedKey;
+  const { graphData, allTags, isLoading } = useGraphData();
 
   if (isLoading) {
     return (
