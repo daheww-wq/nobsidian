@@ -48,23 +48,28 @@ body {
   margin-bottom: 0 !important;
 }
 
-/* 코드블록·인라인 코드 흰 배경 */
-.bn-editor code,
+/* 코드블록·인라인 코드 — 흰 배경 + 코드 리더 스타일 */
+.bn-editor code {
+  font-family: 'Menlo', 'Monaco', 'Consolas', 'Liberation Mono', monospace !important;
+  font-size: 0.9em !important;
+  background-color: #f6f8fa !important;
+  border: 1px solid #e1e4e8 !important;
+  border-radius: 3px !important;
+  padding: 1px 5px !important;
+  color: #24292e !important;
+}
+
 .bn-editor pre,
 .bn-editor [data-content-type='codeBlock'],
 .bn-editor .bn-code-block {
-  background-color: #fff !important;
-  border: 1px solid #e5e7eb !important;
-  color: #374151 !important;
-}
-
-.bn-editor code {
-  border-radius: 3px !important;
-  padding: 1px 4px !important;
-}
-
-.bn-editor pre,
-.bn-editor [data-content-type='codeBlock'] {
+  font-family: 'Menlo', 'Monaco', 'Consolas', 'Liberation Mono', monospace !important;
+  font-size: 0.88em !important;
+  background-color: #f6f8fa !important;
+  border: 1px solid #e1e4e8 !important;
   border-radius: 6px !important;
-  padding: 10px 14px !important;
+  padding: 12px 16px !important;
+  color: #24292e !important;
+  line-height: 1.6 !important;
+  white-space: pre !important;
+  overflow-x: auto !important;
 }

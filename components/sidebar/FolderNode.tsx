@@ -132,8 +132,10 @@ export function FolderNode({ node, depth, onCreateNote, onCreateFolder }: Folder
       <div ref={setNodeRef} style={style}>
         <div
           style={{ paddingLeft: `${depth * 12 + 8}px` }}
-          className={`group flex cursor-pointer items-center gap-1 rounded-md py-0.5 pr-2 text-xs select-none ${
-            isOver ? 'bg-green-50 ring-1 ring-green-400' : 'text-gray-600 hover:bg-gray-100'
+          className={`group flex cursor-pointer items-center gap-1 rounded-md py-0.5 pr-2 text-xs font-medium select-none ${
+            isOver
+              ? 'bg-green-50 ring-1 ring-green-400'
+              : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
           }`}
           onClick={() => toggleExpand(node.path)}
           onContextMenu={handleRightClick}
@@ -152,9 +154,9 @@ export function FolderNode({ node, depth, onCreateNote, onCreateFolder }: Folder
             style={{ transform: isExpanded ? 'rotate(90deg)' : '' }}
           />
           {isExpanded ? (
-            <FolderOpen size={13} className="shrink-0 text-gray-400" />
+            <FolderOpen size={13} className="shrink-0 text-gray-500" />
           ) : (
-            <Folder size={13} className="shrink-0 text-gray-400" />
+            <Folder size={13} className="shrink-0 text-gray-500" />
           )}
           <span className="truncate">{node.name}</span>
         </div>
