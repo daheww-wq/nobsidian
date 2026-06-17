@@ -37,6 +37,7 @@ export function HistoryPanel() {
   const [commitsFor, setCommitsFor] = useState<string | null>(null);
   const [selected, setSelected] = useState<Commit | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
+  const [previewLoading, setPreviewLoading] = useState(false);
 
   const isLoading = activePath !== commitsFor;
 
@@ -65,7 +66,18 @@ export function HistoryPanel() {
 
   const handleSelect = (commit: Commit) => {
     setSelected(commit);
-    setPreview(`커밋: ${commit.message}\n시간: ${new Date(commit.date).toLocaleString('ko-KR')}`);
+    setPreview(null);
+    if (!activePath || !selectedRepo) return;
+
+    const owner = selectedRepo.full_name.split('/')[0];
+    setPreviewLoading(true);
+    fetch(
+      `/api/notes/version?owner=${owner}&repo=${selectedRepo.name}&path=${encodeURIComponent(activePath)}&sha=${commit.sha}`
+    )
+      .then((r) => r.json())
+      .then((d: { content?: string }) => setPreview(d.content ?? '(내용 없음)'))
+      .catch(() => setPreview('(불러오기 실패)'))
+      .finally(() => setPreviewLoading(false));
   };
 
   const handleRestore = async (commit: Commit) => {
@@ -152,11 +164,13 @@ export function HistoryPanel() {
                 <p className="mt-0.5 text-xs text-gray-400">
                   {new Date(selected.date).toLocaleString('ko-KR')}
                 </p>
-                {preview && (
+                {previewLoading ? (
+                  <p className="mt-4 text-xs text-gray-400">불러오는 중...</p>
+                ) : preview ? (
                   <pre className="mt-4 rounded bg-gray-50 p-3 text-xs whitespace-pre-wrap text-gray-600">
                     {preview}
                   </pre>
-                )}
+                ) : null}
               </div>
               <div className="border-t border-gray-100 px-4 py-3">
                 <button
