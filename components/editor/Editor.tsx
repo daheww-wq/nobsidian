@@ -37,9 +37,9 @@ export function Editor() {
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [isOnline, setIsOnline] = useState(true);
   const saveQueueRef = useRef<SaveQueue | null>(null);
-  // triggerSave self-reference를 ref로 보관 — useCallback 내부에서 자기 자신을 참조할 때
-  // no-use-before-define 가능성 없이 최신 버전을 클로저로 캡처
   const triggerSaveRef = useRef<((isManual: boolean) => Promise<void>) | null>(null);
+  // 동시 저장 방지 — 자동저장이 진행 중일 때 추가 자동저장 스킵
+  const isSavingRef = useRef(false);
 
   const forceOverwrite = useCallback(
     async (content: string) => {
@@ -61,8 +61,10 @@ export function Editor() {
 
   const triggerSave = useCallback(
     async (isManual: boolean) => {
+      // 자동저장 중복 실행 방지 — 수동 저장(Cmd+S)은 항상 통과
+      if (isSavingRef.current && !isManual) return;
+
       if (!activePath || !frontmatter || !selectedRepo) return;
-      // 항상 스토어에서 최신 SHA 읽기 — 클로저 stale 방지
       const sha = useEditorStore.getState().activeSha;
       if (!sha) return;
       if (!isOnline) {
@@ -71,11 +73,12 @@ export function Editor() {
       }
       if (!isManual && !markdownBody.trim() && !frontmatter.title.trim()) return;
 
+      isSavingRef.current = true;
       setSaveStatus('saving');
       const content = serializeFrontmatter(frontmatter, markdownBody);
       const owner = selectedRepo.full_name.split('/')[0];
 
-      if (isManual) saveQueueRef.current?.flush();
+      if (isManual) void saveQueueRef.current?.flush();
 
       try {
         const res = await fetch('/api/notes/save', {
@@ -107,12 +110,13 @@ export function Editor() {
         noteCache.set(activePath, content, data.sha);
       } catch {
         setSaveStatus('error');
-        // triggerSaveRef를 통해 최신 triggerSave 참조 — 재시도 버튼 복원
         toast({
           type: 'error',
           message: '저장에 실패했습니다.',
           action: { label: '재시도', onClick: () => triggerSaveRef.current?.(isManual) },
         });
+      } finally {
+        isSavingRef.current = false;
       }
     },
     [
@@ -142,21 +146,21 @@ export function Editor() {
     };
   }, [activePath]);
 
-  // 배치 저장 큐 초기화
+  // 배치 저장 큐 — triggerSaveRef를 통해 항상 최신 triggerSave 호출, activePath 변경 시만 재생성
   useEffect(() => {
     const queue = new SaveQueue(async (items) => {
       const last = items[items.length - 1];
-      if (last) await triggerSave(last.isManual);
+      if (last) await triggerSaveRef.current?.(last.isManual);
     });
     saveQueueRef.current = queue;
     return () => queue.destroy();
-  }, [activePath, triggerSave]);
+  }, [activePath]);
 
   // Online/offline 감지
   useEffect(() => {
     const onOnline = () => {
       setIsOnline(true);
-      if (saveStatus === 'offline') triggerSave(false);
+      if (saveStatus === 'offline') triggerSaveRef.current?.(false);
     };
     const onOffline = () => {
       setIsOnline(false);
@@ -168,7 +172,7 @@ export function Editor() {
       window.removeEventListener('online', onOnline);
       window.removeEventListener('offline', onOffline);
     };
-  }, [saveStatus, triggerSave, setSaveStatus]);
+  }, [saveStatus, setSaveStatus]);
 
   // beforeunload 경고
   useEffect(() => {
@@ -187,12 +191,12 @@ export function Editor() {
     const handler = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 's') {
         e.preventDefault();
-        triggerSave(true);
+        triggerSaveRef.current?.(true);
       }
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [triggerSave]);
+  }, []);
 
   const handleBodyChange = useCallback(
     (markdown: string) => {
@@ -200,11 +204,14 @@ export function Editor() {
       setSaveStatus('unsaved');
       if (saveTimer.current) clearTimeout(saveTimer.current);
       saveTimer.current = setTimeout(() => {
-        if (activePath) saveQueueRef.current?.push(activePath, markdown, false);
-        triggerSave(false);
+        if (activePath) {
+          // push + 즉시 flush — 직접 triggerSave 호출 제거 (double-save 방지)
+          saveQueueRef.current?.push(activePath, markdown, false);
+          void saveQueueRef.current?.flush();
+        }
       }, AUTOSAVE_DELAY);
     },
-    [setMarkdownBody, setSaveStatus, triggerSave, activePath]
+    [setMarkdownBody, setSaveStatus, activePath]
   );
 
   const handleTitleChange = useCallback(
@@ -212,9 +219,14 @@ export function Editor() {
       updateFrontmatter({ title });
       setSaveStatus('unsaved');
       if (saveTimer.current) clearTimeout(saveTimer.current);
-      saveTimer.current = setTimeout(() => triggerSave(false), AUTOSAVE_DELAY);
+      saveTimer.current = setTimeout(() => {
+        if (activePath) {
+          saveQueueRef.current?.push(activePath, markdownBody, false);
+          void saveQueueRef.current?.flush();
+        }
+      }, AUTOSAVE_DELAY);
     },
-    [updateFrontmatter, setSaveStatus, triggerSave]
+    [updateFrontmatter, setSaveStatus, activePath, markdownBody]
   );
 
   if (!activePath || !frontmatter) {
@@ -229,7 +241,7 @@ export function Editor() {
   return (
     <div className="flex flex-1 flex-col overflow-hidden">
       <EditorToolbar
-        onSave={() => triggerSave(true)}
+        onSave={() => triggerSaveRef.current?.(true)}
         fontSize={fontSize}
         onFontSizeIncrease={increaseFontSize}
         onFontSizeDecrease={decreaseFontSize}

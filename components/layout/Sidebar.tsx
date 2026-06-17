@@ -16,11 +16,6 @@ export function Sidebar() {
 
   const showSearch = isActive || !!query;
 
-  // 현재 노트의 상위 폴더 경로 추출
-  const folderPath = activePath?.includes('/')
-    ? activePath.split('/').slice(0, -1).join(' / ')
-    : null;
-
   return (
     <aside
       data-testid="sidebar"
@@ -31,13 +26,13 @@ export function Sidebar() {
         onCreateFolder={() => fileTreeRef.current?.openCreate('folder')}
       />
 
-      {/* 현재 노트의 폴더 경로 */}
-      {folderPath && (
+      {/* 현재 노트 경로 — 폴더 아이템과 동일한 크기(py-1 text-sm) */}
+      {activePath && (
         <div
-          className="truncate border-b border-gray-100 px-3 py-1.5 text-[10px] text-gray-400"
-          title={folderPath}
+          className="truncate border-b border-gray-100 px-2 py-1 text-sm text-gray-400"
+          title={activePath}
         >
-          📁 {folderPath}
+          📄 {activePath}
         </div>
       )}
 
