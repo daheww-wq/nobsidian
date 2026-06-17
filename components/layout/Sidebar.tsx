@@ -7,12 +7,19 @@ import { SearchResults } from '@/components/sidebar/SearchResults';
 import { FileTree, type FileTreeHandle } from '@/components/sidebar/FileTree';
 import { LinkedNotesList } from '@/components/sidebar/LinkedNotesList';
 import { useSearchStore } from '@/store/searchStore';
+import { useEditorStore } from '@/store/editorStore';
 
 export function Sidebar() {
   const { isActive, query } = useSearchStore();
+  const { activePath } = useEditorStore();
   const fileTreeRef = useRef<FileTreeHandle>(null);
 
   const showSearch = isActive || !!query;
+
+  // 현재 노트의 상위 폴더 경로 추출
+  const folderPath = activePath?.includes('/')
+    ? activePath.split('/').slice(0, -1).join(' / ')
+    : null;
 
   return (
     <aside
@@ -23,6 +30,17 @@ export function Sidebar() {
         onCreateNote={() => fileTreeRef.current?.openCreate('note')}
         onCreateFolder={() => fileTreeRef.current?.openCreate('folder')}
       />
+
+      {/* 현재 노트의 폴더 경로 */}
+      {folderPath && (
+        <div
+          className="truncate border-b border-gray-100 px-3 py-1.5 text-[10px] text-gray-400"
+          title={folderPath}
+        >
+          📁 {folderPath}
+        </div>
+      )}
+
       <SearchBar />
 
       {showSearch ? (

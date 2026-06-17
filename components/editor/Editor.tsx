@@ -11,6 +11,7 @@ import { toast } from '@/components/ui/Toast';
 import { EditorSkeleton } from '@/components/ui/Skeleton';
 import { NoteTitle } from './NoteTitle';
 import { EditorToolbar } from './EditorToolbar';
+import { useEditorFontSize } from '@/lib/hooks/useEditorFontSize';
 
 const BlockNoteEditor = dynamic(() => import('./BlockNoteEditor'), {
   ssr: false,
@@ -32,6 +33,7 @@ export function Editor() {
     updateFrontmatter,
   } = useEditorStore();
   const { selectedRepo } = useRepoStore();
+  const { fontSize, increase: increaseFontSize, decrease: decreaseFontSize } = useEditorFontSize();
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [isOnline, setIsOnline] = useState(true);
   const saveQueueRef = useRef<SaveQueue | null>(null);
@@ -130,6 +132,16 @@ export function Editor() {
     triggerSaveRef.current = triggerSave;
   }, [triggerSave]);
 
+  // activePath 변경 시 pending save timer 정리 — 이전 노트로의 stale 저장 방지
+  useEffect(() => {
+    return () => {
+      if (saveTimer.current) {
+        clearTimeout(saveTimer.current);
+        saveTimer.current = null;
+      }
+    };
+  }, [activePath]);
+
   // 배치 저장 큐 초기화
   useEffect(() => {
     const queue = new SaveQueue(async (items) => {
@@ -216,8 +228,16 @@ export function Editor() {
 
   return (
     <div className="flex flex-1 flex-col overflow-hidden">
-      <EditorToolbar onSave={() => triggerSave(true)} />
-      <div className="flex-1 overflow-y-auto">
+      <EditorToolbar
+        onSave={() => triggerSave(true)}
+        fontSize={fontSize}
+        onFontSizeIncrease={increaseFontSize}
+        onFontSizeDecrease={decreaseFontSize}
+      />
+      <div
+        className="flex-1 overflow-y-auto"
+        style={{ '--editor-font-size': `${fontSize}px` } as React.CSSProperties}
+      >
         <div className="mx-auto max-w-[960px] px-20 py-12">
           <NoteTitle value={frontmatter.title} onChange={handleTitleChange} />
           <BlockNoteEditor

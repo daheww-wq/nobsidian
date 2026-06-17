@@ -20,9 +20,17 @@ const STATUS_COLOR: Record<SaveStatus, string> = {
 
 interface EditorToolbarProps {
   onSave: () => void;
+  fontSize: number;
+  onFontSizeIncrease: () => void;
+  onFontSizeDecrease: () => void;
 }
 
-export function EditorToolbar({ onSave }: EditorToolbarProps) {
+export function EditorToolbar({
+  onSave,
+  fontSize,
+  onFontSizeIncrease,
+  onFontSizeDecrease,
+}: EditorToolbarProps) {
   const { saveStatus, toggleHistory, activePath } = useEditorStore();
 
   return (
@@ -31,6 +39,25 @@ export function EditorToolbar({ onSave }: EditorToolbarProps) {
         {STATUS_LABEL[saveStatus]}
       </span>
       <div className="flex items-center gap-2">
+        {/* Font size controls */}
+        <div className="flex items-center gap-0.5 rounded-md border border-gray-200 px-1">
+          <button
+            onClick={onFontSizeDecrease}
+            className="px-1 py-0.5 text-xs text-gray-500 hover:text-gray-800"
+            title="글씨 크기 줄이기"
+          >
+            A-
+          </button>
+          <span className="px-1 text-[10px] text-gray-400 select-none">{fontSize}</span>
+          <button
+            onClick={onFontSizeIncrease}
+            className="px-1 py-0.5 text-xs text-gray-500 hover:text-gray-800"
+            title="글씨 크기 키우기"
+          >
+            A+
+          </button>
+        </div>
+
         {activePath && (
           <button
             onClick={toggleHistory}

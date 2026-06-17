@@ -1,9 +1,14 @@
 'use client';
 
+import { useState, useCallback, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { useEditorStore } from '@/store/editorStore';
 import { useGraphData } from '@/lib/hooks/useGraphData';
+
+const DEFAULT_WIDTH = 400;
+const MIN_WIDTH = 250;
+const MAX_WIDTH = 700;
 
 const KnowledgeGraph = dynamic(
   () => import('@/components/graph/KnowledgeGraph').then((m) => m.KnowledgeGraph),
@@ -20,13 +25,55 @@ const KnowledgeGraph = dynamic(
 export function GraphPanel() {
   const { isGraphPanelOpen, toggleGraphPanel } = useEditorStore();
   const { graphData, isLoading } = useGraphData();
+  const [width, setWidth] = useState(DEFAULT_WIDTH);
+  const [isResizing, setIsResizing] = useState(false);
+  const startXRef = useRef(0);
+  const startWidthRef = useRef(DEFAULT_WIDTH);
+
+  const handleResizeMouseDown = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault();
+      setIsResizing(true);
+      startXRef.current = e.clientX;
+      startWidthRef.current = width;
+
+      const onMouseMove = (ev: MouseEvent) => {
+        const newWidth = Math.max(
+          MIN_WIDTH,
+          Math.min(MAX_WIDTH, startWidthRef.current + (startXRef.current - ev.clientX))
+        );
+        setWidth(newWidth);
+      };
+
+      const onMouseUp = () => {
+        setIsResizing(false);
+        window.removeEventListener('mousemove', onMouseMove);
+        window.removeEventListener('mouseup', onMouseUp);
+      };
+
+      window.addEventListener('mousemove', onMouseMove);
+      window.addEventListener('mouseup', onMouseUp);
+    },
+    [width]
+  );
 
   return (
     <div
-      className="overflow-hidden border-l border-gray-200 bg-white transition-all duration-200"
-      style={{ width: isGraphPanelOpen ? '400px' : '0' }}
+      className="overflow-hidden border-l border-gray-200 bg-white"
+      style={{
+        width: isGraphPanelOpen ? `${width}px` : '0',
+        transition: isResizing ? 'none' : 'width 0.2s',
+      }}
     >
-      <div className="flex h-full w-[400px] flex-col">
+      <div className="relative flex h-full flex-col" style={{ width: `${width}px` }}>
+        {/* Drag handle */}
+        {isGraphPanelOpen && (
+          <div
+            className="absolute top-0 left-0 z-10 h-full w-1 cursor-col-resize hover:bg-green-300"
+            onMouseDown={handleResizeMouseDown}
+          />
+        )}
+
         {/* Header */}
         <div className="flex shrink-0 items-center justify-between border-b border-gray-100 px-4 py-3">
           <h2 className="text-sm font-semibold">지식 그래프</h2>

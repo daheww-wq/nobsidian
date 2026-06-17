@@ -64,14 +64,19 @@ export const FileTree = forwardRef<FileTreeHandle>(function FileTree(_props, ref
       const srcNode = findNode(tree, srcPath);
       if (!srcNode) return;
 
-      if (dstPath.startsWith(srcPath + '/')) {
+      // 폴더를 자신의 하위로 이동 방지
+      if (dstNode.path.startsWith(srcPath + '/') || dstNode.path === srcPath) {
         toast({ type: 'error', message: '폴더를 자신의 하위로 이동할 수 없습니다.' });
         return;
       }
 
-      const newPath = `${dstPath}/${srcNode.name}`;
+      // 같은 위치 드롭 무시
+      const srcParent = srcPath.includes('/') ? srcPath.split('/').slice(0, -1).join('/') : null;
+      if (dstNode.path === srcParent || (!srcParent && dstNode.path === '')) return;
+
+      const newPath = `${dstNode.path}/${srcNode.name}`;
       useFileTreeStore.getState().removeNode(srcPath);
-      addNode({ ...srcNode, path: newPath }, dstPath);
+      addNode({ ...srcNode, path: newPath }, dstNode.path);
 
       try {
         const res = await fetch('/api/move', {
@@ -87,7 +92,7 @@ export const FileTree = forwardRef<FileTreeHandle>(function FileTree(_props, ref
         if (!res.ok) throw new Error();
       } catch {
         useFileTreeStore.getState().removeNode(newPath);
-        addNode(srcNode, null);
+        addNode(srcNode, srcParent);
         toast({ type: 'error', message: '이동에 실패했습니다.' });
       }
     },

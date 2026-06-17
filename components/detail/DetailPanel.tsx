@@ -1,21 +1,62 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { useEditorStore } from '@/store/editorStore';
 import { useFileTreeStore } from '@/store/fileTreeStore';
 import { toast } from '@/components/ui/Toast';
 import { extractBacklinks } from '@/lib/markdown/backlinks';
 
+const DEFAULT_WIDTH = 256;
+const MIN_WIDTH = 180;
+const MAX_WIDTH = 600;
+
 export function DetailPanel() {
-  const { isDetailPanelOpen, frontmatter, markdownBody, activePath, updateFrontmatter } =
-    useEditorStore();
+  const {
+    isDetailPanelOpen,
+    toggleDetailPanel,
+    frontmatter,
+    markdownBody,
+    activePath,
+    updateFrontmatter,
+  } = useEditorStore();
   const { tree } = useFileTreeStore();
 
   const [isSummarizing, setIsSummarizing] = useState(false);
   const [tagInput, setTagInput] = useState('');
+  const [width, setWidth] = useState(DEFAULT_WIDTH);
+  const [isResizing, setIsResizing] = useState(false);
+
+  const startXRef = useRef(0);
+  const startWidthRef = useRef(DEFAULT_WIDTH);
+
+  const handleResizeMouseDown = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault();
+      setIsResizing(true);
+      startXRef.current = e.clientX;
+      startWidthRef.current = width;
+
+      const onMouseMove = (ev: MouseEvent) => {
+        const newWidth = Math.max(
+          MIN_WIDTH,
+          Math.min(MAX_WIDTH, startWidthRef.current + (startXRef.current - ev.clientX))
+        );
+        setWidth(newWidth);
+      };
+
+      const onMouseUp = () => {
+        setIsResizing(false);
+        window.removeEventListener('mousemove', onMouseMove);
+        window.removeEventListener('mouseup', onMouseUp);
+      };
+
+      window.addEventListener('mousemove', onMouseMove);
+      window.addEventListener('mouseup', onMouseUp);
+    },
+    [width]
+  );
 
   const backlinks = markdownBody ? extractBacklinks(markdownBody) : [];
-
   const allNotePaths = flattenNotePaths(tree);
 
   const handleSummarize = useCallback(async () => {
@@ -73,135 +114,162 @@ export function DetailPanel() {
 
   return (
     <div
-      className="overflow-hidden border-l border-gray-200 bg-white transition-all duration-200"
-      style={{ width: isDetailPanelOpen ? '256px' : '0' }}
+      className="overflow-hidden border-l border-gray-200 bg-white"
+      style={{
+        width: isDetailPanelOpen ? `${width}px` : '0',
+        transition: isResizing ? 'none' : 'width 0.2s',
+      }}
     >
-      <div className="h-full w-[256px] overflow-y-auto">
-        <div className="space-y-5 p-4 text-sm">
-          {/* AI Summary */}
-          <section>
-            <div className="mb-2 flex items-center justify-between">
-              <h3 className="text-xs font-semibold tracking-wide text-gray-400 uppercase">
-                AI 요약
-              </h3>
-              <button
-                onClick={handleSummarize}
-                disabled={isSummarizing}
-                className="text-[10px] text-gray-400 hover:text-gray-700 disabled:opacity-50"
-              >
-                {isSummarizing ? '생성 중...' : '갱신'}
-              </button>
-            </div>
-            {frontmatter?.summary ? (
-              <p className="text-xs leading-relaxed text-gray-600">{frontmatter.summary}</p>
-            ) : (
-              <p className="text-xs text-gray-300">요약 없음</p>
-            )}
-          </section>
+      <div className="relative flex h-full flex-col" style={{ width: `${width}px` }}>
+        {/* Drag handle */}
+        {isDetailPanelOpen && (
+          <div
+            className="absolute top-0 left-0 z-10 h-full w-1 cursor-col-resize hover:bg-green-300"
+            onMouseDown={handleResizeMouseDown}
+          />
+        )}
 
-          <hr className="border-gray-100" />
+        {/* Header */}
+        <div className="flex shrink-0 items-center justify-between border-b border-gray-100 px-4 py-3">
+          <h2 className="text-sm font-semibold">요약 & 태그</h2>
+          <button onClick={toggleDetailPanel} className="text-gray-400 hover:text-gray-600">
+            ✕
+          </button>
+        </div>
 
-          {/* Tags */}
-          <section>
-            <div className="mb-2 flex items-center justify-between">
-              <h3 className="text-xs font-semibold tracking-wide text-gray-400 uppercase">태그</h3>
-              <button
-                onClick={handleAutoTag}
-                className="text-[10px] text-gray-400 hover:text-gray-700"
-              >
-                AI 자동
-              </button>
-            </div>
-            <div className="mb-2 flex flex-wrap gap-1">
-              {frontmatter?.tags.map((tag) => (
-                <span
-                  key={tag}
-                  className="flex items-center gap-1 rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600"
+        {/* Scrollable content */}
+        <div className="flex-1 overflow-y-auto">
+          <div className="space-y-5 p-4 text-sm">
+            {/* AI Summary */}
+            <section>
+              <div className="mb-2 flex items-center justify-between">
+                <h3 className="text-xs font-semibold tracking-wide text-gray-400 uppercase">
+                  AI 요약
+                </h3>
+                <button
+                  onClick={handleSummarize}
+                  disabled={isSummarizing}
+                  className="text-[10px] text-gray-400 hover:text-gray-700 disabled:opacity-50"
                 >
-                  {tag}
-                  <button
-                    onClick={() => removeTag(tag)}
-                    className="text-gray-400 hover:text-gray-700"
+                  {isSummarizing ? '생성 중...' : '갱신'}
+                </button>
+              </div>
+              {frontmatter?.summary ? (
+                <p className="text-xs leading-relaxed text-gray-600">{frontmatter.summary}</p>
+              ) : (
+                <p className="text-xs text-gray-300">요약 없음</p>
+              )}
+            </section>
+
+            <hr className="border-gray-100" />
+
+            {/* Tags */}
+            <section>
+              <div className="mb-2 flex items-center justify-between">
+                <h3 className="text-xs font-semibold tracking-wide text-gray-400 uppercase">
+                  태그
+                </h3>
+                <button
+                  onClick={handleAutoTag}
+                  className="text-[10px] text-gray-400 hover:text-gray-700"
+                >
+                  AI 자동
+                </button>
+              </div>
+              <div className="mb-2 flex flex-wrap gap-1">
+                {frontmatter?.tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="flex items-center gap-1 rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600"
                   >
-                    ×
-                  </button>
-                </span>
-              ))}
-            </div>
-            <div className="flex gap-1">
-              <input
-                value={tagInput}
-                onChange={(e) => setTagInput(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && addTag()}
-                placeholder="태그 추가..."
-                className="flex-1 rounded border border-gray-200 px-2 py-1 text-xs outline-none focus:border-gray-400"
-              />
-              <button
-                onClick={addTag}
-                className="rounded border border-gray-200 px-2 py-1 text-xs hover:bg-gray-50"
-              >
-                +
-              </button>
-            </div>
-          </section>
-
-          <hr className="border-gray-100" />
-
-          {/* Backlinks */}
-          <section>
-            <h3 className="mb-2 text-xs font-semibold tracking-wide text-gray-400 uppercase">
-              연결 노트 ({backlinks.length})
-            </h3>
-            {backlinks.length === 0 ? (
-              <p className="text-xs text-gray-300">백링크 없음</p>
-            ) : (
-              <ul className="space-y-1">
-                {backlinks.map((bl, i) => {
-                  const exists = allNotePaths.some(
-                    (p) =>
-                      p.replace(/\.md$/, '') === bl ||
-                      p.replace(/\.md$/, '').split('/').pop() === bl
-                  );
-                  return (
-                    <li key={i} className={`text-xs ${exists ? 'text-blue-600' : 'text-red-400'}`}>
-                      {!exists && <span title="깨진 링크">⚠ </span>}[[{bl}]]
-                    </li>
-                  );
-                })}
-              </ul>
-            )}
-          </section>
-
-          <hr className="border-gray-100" />
-
-          {/* File info */}
-          <section>
-            <h3 className="mb-2 text-xs font-semibold tracking-wide text-gray-400 uppercase">
-              파일 정보
-            </h3>
-            <dl className="space-y-1 text-xs text-gray-500">
-              <div className="flex justify-between">
-                <dt>경로</dt>
-                <dd className="max-w-[150px] truncate text-right text-gray-700">{activePath}</dd>
+                    {tag}
+                    <button
+                      onClick={() => removeTag(tag)}
+                      className="text-gray-400 hover:text-gray-700"
+                    >
+                      ×
+                    </button>
+                  </span>
+                ))}
               </div>
-              <div className="flex justify-between">
-                <dt>생성</dt>
-                <dd>
-                  {frontmatter?.created
-                    ? new Date(frontmatter.created).toLocaleDateString('ko-KR')
-                    : '-'}
-                </dd>
+              <div className="flex gap-1">
+                <input
+                  value={tagInput}
+                  onChange={(e) => setTagInput(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && addTag()}
+                  placeholder="태그 추가..."
+                  className="flex-1 rounded border border-gray-200 px-2 py-1 text-xs outline-none focus:border-gray-400"
+                />
+                <button
+                  onClick={addTag}
+                  className="rounded border border-gray-200 px-2 py-1 text-xs hover:bg-gray-50"
+                >
+                  +
+                </button>
               </div>
-              <div className="flex justify-between">
-                <dt>수정</dt>
-                <dd>
-                  {frontmatter?.updated
-                    ? new Date(frontmatter.updated).toLocaleDateString('ko-KR')
-                    : '-'}
-                </dd>
-              </div>
-            </dl>
-          </section>
+            </section>
+
+            <hr className="border-gray-100" />
+
+            {/* Backlinks */}
+            <section>
+              <h3 className="mb-2 text-xs font-semibold tracking-wide text-gray-400 uppercase">
+                연결 노트 ({backlinks.length})
+              </h3>
+              {backlinks.length === 0 ? (
+                <p className="text-xs text-gray-300">백링크 없음</p>
+              ) : (
+                <ul className="space-y-1">
+                  {backlinks.map((bl, i) => {
+                    const exists = allNotePaths.some(
+                      (p) =>
+                        p.replace(/\.md$/, '') === bl ||
+                        p.replace(/\.md$/, '').split('/').pop() === bl
+                    );
+                    return (
+                      <li
+                        key={i}
+                        className={`text-xs ${exists ? 'text-blue-600' : 'text-red-400'}`}
+                      >
+                        {!exists && <span title="깨진 링크">⚠ </span>}[[{bl}]]
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </section>
+
+            <hr className="border-gray-100" />
+
+            {/* File info */}
+            <section>
+              <h3 className="mb-2 text-xs font-semibold tracking-wide text-gray-400 uppercase">
+                파일 정보
+              </h3>
+              <dl className="space-y-1 text-xs text-gray-500">
+                <div className="flex justify-between">
+                  <dt>경로</dt>
+                  <dd className="max-w-[150px] truncate text-right text-gray-700">{activePath}</dd>
+                </div>
+                <div className="flex justify-between">
+                  <dt>생성</dt>
+                  <dd>
+                    {frontmatter?.created
+                      ? new Date(frontmatter.created).toLocaleDateString('ko-KR')
+                      : '-'}
+                  </dd>
+                </div>
+                <div className="flex justify-between">
+                  <dt>수정</dt>
+                  <dd>
+                    {frontmatter?.updated
+                      ? new Date(frontmatter.updated).toLocaleDateString('ko-KR')
+                      : '-'}
+                  </dd>
+                </div>
+              </dl>
+            </section>
+          </div>
         </div>
       </div>
     </div>
