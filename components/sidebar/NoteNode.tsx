@@ -135,6 +135,7 @@ export function NoteNode({ node, depth }: NoteNodeProps) {
   return (
     <>
       <div
+        data-testid="file-item"
         ref={setNodeRef}
         style={{ ...style, paddingLeft: `${depth * 12 + 8}px` }}
         className={`group flex cursor-pointer items-center gap-1.5 rounded-md py-1 pr-2 text-sm select-none ${

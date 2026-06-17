@@ -15,7 +15,10 @@ export function Sidebar() {
   const showSearch = isActive || !!query;
 
   return (
-    <aside className="flex w-60 shrink-0 flex-col overflow-hidden border-r border-gray-200 bg-white">
+    <aside
+      data-testid="sidebar"
+      className="flex w-60 shrink-0 flex-col overflow-hidden border-r border-gray-200 bg-white"
+    >
       <SidebarToolbar
         onCreateNote={() => fileTreeRef.current?.openCreate('note')}
         onCreateFolder={() => fileTreeRef.current?.openCreate('folder')}

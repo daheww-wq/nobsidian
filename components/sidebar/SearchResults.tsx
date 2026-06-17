@@ -12,7 +12,7 @@ export function SearchResults() {
   };
 
   return (
-    <div className="flex flex-1 flex-col overflow-hidden">
+    <div data-testid="search-results" className="flex flex-1 flex-col overflow-hidden">
       {/* 정렬 토글 */}
       <div className="flex items-center justify-between border-b border-gray-100 px-3 py-1">
         <span className="text-[10px] text-gray-400">

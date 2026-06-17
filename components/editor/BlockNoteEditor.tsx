@@ -140,7 +140,7 @@ export default function BlockNoteEditorComponent({
   );
 
   return (
-    <div onClick={handleEditorClick} role="presentation">
+    <div data-testid="blocknote-editor" onClick={handleEditorClick} role="presentation">
       <BlockNoteView
         editor={editor}
         onChange={handleChange}
@@ -159,7 +159,32 @@ export default function BlockNoteEditorComponent({
           )}
         />
         {/* [[백링크]] 자동완성 메뉴 */}
-        <SuggestionMenuController triggerCharacter="[" getItems={getBacklinkItems} />
+        <SuggestionMenuController
+          triggerCharacter="["
+          getItems={getBacklinkItems}
+          suggestionMenuComponent={(props) => (
+            <div data-testid="backlink-menu">
+              {/* DefaultSuggestionMenu re-export가 없으므로 props를 통해 아이템 목록 렌더링 */}
+              <ul className="rounded-lg border border-gray-200 bg-white py-1 shadow-lg">
+                {props.items.map((item, i) => (
+                  <li
+                    key={i}
+                    className={`cursor-pointer px-3 py-1.5 text-sm hover:bg-gray-50 ${props.selectedIndex === i ? 'bg-gray-100' : ''}`}
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      props.onItemClick?.(item);
+                    }}
+                  >
+                    <span className="font-medium">{item.title}</span>
+                    {item.subtext && (
+                      <span className="ml-2 text-xs text-gray-400">{item.subtext}</span>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        />
       </BlockNoteView>
     </div>
   );

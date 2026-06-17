@@ -27,7 +27,7 @@ export function EditorToolbar({ onSave }: EditorToolbarProps) {
 
   return (
     <div className="flex items-center justify-between border-b border-gray-100 px-4 py-2 text-sm">
-      <span className={`text-xs font-medium ${STATUS_COLOR[saveStatus]}`}>
+      <span data-testid="save-status" className={`text-xs font-medium ${STATUS_COLOR[saveStatus]}`}>
         {STATUS_LABEL[saveStatus]}
       </span>
       <div className="flex items-center gap-2">

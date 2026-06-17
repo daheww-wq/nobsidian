@@ -140,10 +140,11 @@ export default function SelectRepoPage() {
             {search ? '검색 결과가 없습니다.' : '레포지토리가 없습니다.'}
           </p>
         ) : (
-          <ul className="space-y-2">
+          <ul data-testid="repo-list" className="space-y-2">
             {filtered.map((repo) => (
               <li key={repo.id}>
                 <button
+                  data-testid="repo-item"
                   onClick={() => handleSelect(repo)}
                   disabled={selecting !== null}
                   className="flex w-full items-center justify-between rounded-lg border border-gray-200 bg-white px-4 py-3.5 text-left transition-colors hover:border-gray-300 hover:bg-gray-50 disabled:opacity-60"

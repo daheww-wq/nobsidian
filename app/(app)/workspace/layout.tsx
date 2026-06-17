@@ -61,7 +61,9 @@ export default function WorkspaceLayout({ children }: { children: React.ReactNod
       <Header />
       <div className="flex flex-1 overflow-hidden">
         <Sidebar />
-        <main className="flex flex-1 flex-col overflow-hidden">{children}</main>
+        <main data-testid="editor-area" className="flex flex-1 flex-col overflow-hidden">
+          {children}
+        </main>
         <DetailPanel />
       </div>
       <StatusBar />
