@@ -1,0 +1,1178 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>dohohon — Wireframe v0.5</title>
+<style>
+  :root {
+    --bg:         #ffffff;
+    --bg-sub:     #f8f9fa;
+    --bg-hover:   #f1f3f5;
+    --bg-active:  #f0fdf4;
+    --border:     #e5e7eb;
+    --border-dim: #f3f4f6;
+    --text:       #111827;
+    --text-2:     #4b5563;
+    --text-3:     #9ca3af;
+    --green:      #22c55e;
+    --green-d:    rgba(34,197,94,.12);
+    --green-b:    rgba(34,197,94,.25);
+    --red:        #ef4444;
+    --amber:      #f59e0b;
+    --blue:       #3b82f6;
+    --shadow-sm:  0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+    --shadow:     0 4px 16px rgba(0,0,0,.08), 0 1px 4px rgba(0,0,0,.04);
+    --shadow-lg:  0 12px 40px rgba(0,0,0,.12), 0 2px 8px rgba(0,0,0,.06);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, 'Segoe UI', sans-serif; background: #f0f2f5; color: var(--text); font-size: 13px; }
+
+  /* NAV */
+  .nav { display: flex; background: #fff; border-bottom: 1px solid var(--border); padding: 0 20px; gap: 2px; box-shadow: var(--shadow-sm); }
+  .tab { padding: 12px 16px; font-size: 12px; color: var(--text-3); cursor: pointer; border-bottom: 2px solid transparent; transition: .15s; font-weight: 500; }
+  .tab:hover { color: var(--text-2); }
+  .tab.active { color: var(--green); border-bottom-color: var(--green); }
+
+  /* SCREENS */
+  .screen { display: none; }
+  .screen.active { display: flex; flex-direction: column; }
+
+  /* ─── LABEL ─── */
+  .wf-label { font-size: 10px; color: var(--text-3); text-align: center; padding: 8px; background: #f0f2f5; letter-spacing: .5px; font-weight: 500; }
+
+  /* ──────────────────────────────────────
+     ① LOGIN
+  ────────────────────────────────────── */
+  .login-wrap {
+    min-height: calc(100vh - 46px);
+    background: var(--bg-sub);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .login-card {
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: 16px; padding: 52px 56px;
+    width: 400px; text-align: center;
+    box-shadow: var(--shadow-lg);
+  }
+  .login-logo { font-size: 26px; font-weight: 700; color: var(--text); letter-spacing: -1px; margin-bottom: 6px; }
+  .login-logo span { color: var(--green); }
+  .login-sub { font-size: 13px; color: var(--text-2); margin-bottom: 36px; line-height: 1.7; }
+  .btn-gh {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    width: 100%; padding: 12px; border-radius: 10px;
+    background: var(--text); border: none;
+    color: #fff; font-size: 13px; font-weight: 500; cursor: pointer;
+    transition: .15s;
+  }
+  .btn-gh:hover { background: #1f2937; }
+  .gh-icon { width: 18px; height: 18px; border-radius: 50%; background: #fff; opacity: .85; }
+  .login-divider { display: flex; align-items: center; gap: 12px; margin: 20px 0; }
+  .login-divider hr { flex: 1; border: none; border-top: 1px solid var(--border); }
+  .login-divider span { font-size: 11px; color: var(--text-3); }
+  .login-hint { font-size: 11px; color: var(--text-3); line-height: 1.6; }
+  .login-hint a { color: var(--green); cursor: pointer; }
+
+  /* ──────────────────────────────────────
+     ② REPO SELECT
+  ────────────────────────────────────── */
+  .repo-wrap {
+    min-height: calc(100vh - 46px); background: var(--bg-sub);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .repo-card {
+    background: var(--bg); border: 1px solid var(--border); border-radius: 16px;
+    padding: 36px 40px; width: 500px; box-shadow: var(--shadow-lg);
+  }
+  .repo-card h2 { font-size: 17px; font-weight: 700; margin-bottom: 4px; }
+  .repo-card p { font-size: 12px; color: var(--text-2); margin-bottom: 20px; }
+  .repo-search {
+    width: 100%; background: var(--bg-sub); border: 1px solid var(--border);
+    border-radius: 8px; padding: 9px 12px; font-size: 12px; color: var(--text);
+    margin-bottom: 10px; outline: none;
+  }
+  .repo-list { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin-bottom: 16px; }
+  .repo-item { padding: 10px 14px; border-bottom: 1px solid var(--border-dim); font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: .1s; color: var(--text-2); }
+  .repo-item:last-child { border-bottom: none; }
+  .repo-item:hover { background: var(--bg-hover); }
+  .repo-item.sel { background: var(--bg-active); color: var(--text); border-left: 3px solid var(--green); }
+  .repo-badge { font-size: 10px; background: var(--bg-sub); border: 1px solid var(--border); padding: 1px 6px; border-radius: 4px; color: var(--text-3); margin-left: auto; }
+  .repo-banner { background: var(--bg-active); border: 1px solid var(--green-b); border-radius: 8px; padding: 10px 12px; font-size: 12px; color: var(--text-2); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+  .repo-banner .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
+  .btn-confirm {
+    width: 100%; padding: 11px; background: var(--green); color: #fff;
+    border: none; border-radius: 10px; font-size: 13px; font-weight: 600;
+    cursor: pointer; transition: .15s;
+  }
+  .btn-confirm:hover { background: #16a34a; }
+
+  /* ──────────────────────────────────────
+     ③ WORKSPACE
+  ────────────────────────────────────── */
+  .ws { display: flex; flex-direction: column; height: calc(100vh - 46px); background: var(--bg); }
+
+  /* Header */
+  .ws-hd {
+    height: 48px; background: var(--bg); border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; padding: 0 18px; gap: 10px;
+    flex-shrink: 0; box-shadow: var(--shadow-sm);
+  }
+  .ws-logo { font-size: 15px; font-weight: 700; color: var(--text); letter-spacing: -.5px; }
+  .ws-logo span { color: var(--green); }
+  .hd-sep { width: 1px; height: 18px; background: var(--border); }
+  .repo-pill {
+    display: flex; align-items: center; gap: 6px; font-size: 12px;
+    color: var(--text-2); padding: 4px 10px; border-radius: 6px;
+    background: var(--bg-sub); border: 1px solid var(--border);
+  }
+  .repo-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
+  .ws-sp { flex: 1; }
+  .save-pill {
+    font-size: 11px; padding: 4px 10px; border-radius: 20px; display: flex; align-items: center; gap: 5px;
+    background: var(--bg-active); color: #16a34a; border: 1px solid var(--green-b); font-weight: 500;
+  }
+  .save-pill.saving { color: #d97706; background: #fffbeb; border-color: #fde68a; }
+  .save-dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+  .ws-avatar { width: 28px; height: 28px; border-radius: 50%; background: var(--green-d); border: 1px solid var(--green-b); display: flex; align-items: center; justify-content: center; font-size: 11px; color: #16a34a; font-weight: 700; }
+
+  /* Body */
+  .ws-body { display: flex; flex: 1; overflow: hidden; }
+
+  /* Sidebar */
+  .ws-sb { width: 244px; background: var(--bg-sub); border-right: 1px solid var(--border); display: flex; flex-direction: column; flex-shrink: 0; }
+  .sb-top { padding: 10px 10px 8px; border-bottom: 1px solid var(--border-dim); display: flex; gap: 5px; }
+  .sb-btn {
+    flex: 1; display: flex; align-items: center; justify-content: center; gap: 4px;
+    font-size: 11px; padding: 6px 0; border-radius: 7px;
+    border: 1px solid var(--border); background: var(--bg); color: var(--text-2);
+    cursor: pointer; transition: .1s; font-weight: 500;
+  }
+  .sb-btn:hover { border-color: var(--green); color: var(--green); background: var(--bg-active); }
+  .sb-search {
+    display: flex; align-items: center; gap: 6px; margin: 8px 10px 4px;
+    background: var(--bg); border: 1px solid var(--border); border-radius: 7px;
+    padding: 7px 10px; font-size: 11px; color: var(--text-3);
+  }
+  .tree { flex: 1; overflow-y: auto; padding: 4px 4px; }
+  .ti { padding: 5px 8px; display: flex; align-items: center; gap: 5px; border-radius: 6px; margin: 1px 0; cursor: pointer; color: var(--text-2); font-size: 12px; transition: .1s; }
+  .ti:hover { background: var(--bg-hover); color: var(--text); }
+  .ti.act { background: var(--bg-active); color: #15803d; font-weight: 500; }
+  .ti.folder { color: var(--text); font-weight: 500; }
+  .ti .arr { font-size: 8px; color: var(--text-3); width: 10px; flex-shrink: 0; }
+  .ti-ind { padding-left: 18px; }
+  .ti-ind2 { padding-left: 34px; }
+  .ti-badge { margin-left: auto; font-size: 9px; background: var(--green-d); color: #15803d; padding: 1px 5px; border-radius: 4px; font-weight: 600; }
+
+  /* Editor */
+  .ws-ed { flex: 1; display: flex; flex-direction: column; min-width: 0; background: var(--bg); }
+  .ed-tb {
+    display: flex; align-items: center; gap: 1px; padding: 6px 16px;
+    border-bottom: 1px solid var(--border); background: var(--bg); flex-wrap: wrap;
+  }
+  .tb-sel { background: var(--bg-sub); border: 1px solid var(--border); border-radius: 6px; padding: 4px 8px; font-size: 11px; color: var(--text-2); }
+  .tb-sep { width: 1px; height: 16px; background: var(--border); margin: 0 3px; }
+  .tb-btn { padding: 4px 7px; border-radius: 5px; border: none; background: transparent; color: var(--text-2); cursor: pointer; font-size: 12px; transition: .1s; }
+  .tb-btn:hover { background: var(--bg-hover); color: var(--text); }
+  .tb-btn.act { background: var(--green-d); color: #15803d; }
+  .ed-body { flex: 1; overflow-y: auto; padding: 48px 80px; max-width: 960px; margin: 0 auto; width: 100%; }
+  .note-title { font-size: 28px; font-weight: 700; color: var(--text); border: none; background: transparent; outline: none; width: 100%; letter-spacing: -.8px; margin-bottom: 6px; line-height: 1.3; }
+  .note-meta { font-size: 11px; color: var(--text-3); margin-bottom: 28px; display: flex; gap: 16px; padding-bottom: 20px; border-bottom: 1px solid var(--border-dim); }
+  .ed-content { color: var(--text-2); line-height: 1.85; }
+
+  /* BlockNote style elements */
+  .bn-block { position: relative; margin: 2px 0; }
+  .bn-block:hover .bn-handle { opacity: 1; }
+  .bn-handle { position: absolute; left: -22px; top: 50%; transform: translateY(-50%); opacity: 0; font-size: 10px; color: var(--text-3); cursor: grab; transition: .1s; }
+  .bn-h2 { font-size: 18px; font-weight: 600; color: var(--text); margin: 22px 0 8px; }
+  .bn-h3 { font-size: 15px; font-weight: 600; color: var(--text); margin: 16px 0 6px; }
+  .bn-p { font-size: 14px; margin-bottom: 8px; line-height: 1.75; }
+  .bn-quote { border-left: 3px solid var(--green); padding-left: 14px; color: var(--text-2); font-style: italic; margin: 10px 0; font-size: 14px; }
+  .bn-code { background: var(--bg-sub); border: 1px solid var(--border); border-radius: 8px; padding: 14px 18px; font-family: 'JetBrains Mono', 'Courier New', monospace; font-size: 12px; color: #1e40af; margin: 10px 0; }
+  .bn-table { border-collapse: collapse; width: 100%; margin: 12px 0; font-size: 13px; }
+  .bn-table td, .bn-table th { border: 1px solid var(--border); padding: 8px 12px; }
+  .bn-table th { background: var(--bg-sub); font-weight: 600; color: var(--text); }
+  .bn-check { list-style: none; }
+  .bn-check li { display: flex; align-items: flex-start; gap: 8px; padding: 3px 0; font-size: 14px; }
+  .bn-box { width: 15px; height: 15px; border: 1.5px solid var(--border); border-radius: 4px; flex-shrink: 0; margin-top: 2px; display: flex; align-items: center; justify-content: center; }
+  .bn-box.done { border-color: var(--green); background: var(--green); }
+  .bn-box.done::after { content: '✓'; color: #fff; font-size: 9px; font-weight: 700; }
+  .bn-check .done-text { text-decoration: line-through; color: var(--text-3); }
+  .bn-tag-inline { display: inline-block; background: var(--green-d); color: #15803d; border: 1px solid var(--green-b); border-radius: 4px; padding: 0 6px; font-size: 11px; font-weight: 500; }
+  .bn-img { border: 1px dashed var(--border); border-radius: 10px; padding: 24px; text-align: center; color: var(--text-3); font-size: 12px; margin: 12px 0; background: var(--bg-sub); cursor: pointer; }
+  .bn-img:hover { border-color: var(--green); color: var(--green); background: var(--bg-active); }
+  .bn-strong { color: var(--text); font-weight: 600; }
+
+  /* Slash menu */
+  .slash-menu {
+    background: var(--bg); border: 1px solid var(--border); border-radius: 10px;
+    box-shadow: var(--shadow-lg); width: 260px; padding: 6px;
+    margin: 10px 0;
+  }
+  .slash-label { font-size: 10px; font-weight: 600; color: var(--text-3); text-transform: uppercase; letter-spacing: .8px; padding: 6px 8px 4px; }
+  .slash-item { display: flex; align-items: center; gap: 10px; padding: 7px 8px; border-radius: 6px; cursor: pointer; transition: .1s; }
+  .slash-item:hover, .slash-item.sel { background: var(--bg-active); }
+  .slash-icon { width: 28px; height: 28px; border-radius: 6px; background: var(--bg-sub); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; }
+  .slash-info { display: flex; flex-direction: column; }
+  .slash-name { font-size: 12px; font-weight: 500; color: var(--text); }
+  .slash-desc { font-size: 10px; color: var(--text-3); }
+
+  /* Inline toolbar */
+  .inline-tb {
+    display: inline-flex; align-items: center; gap: 1px;
+    background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 4px 6px;
+    box-shadow: var(--shadow-lg); margin: 12px 0;
+  }
+  .it-btn { padding: 4px 7px; border-radius: 5px; border: none; background: transparent; color: var(--text-2); cursor: pointer; font-size: 12px; }
+  .it-btn:hover { background: var(--bg-hover); color: var(--text); }
+  .it-sep { width: 1px; height: 14px; background: var(--border); margin: 0 2px; }
+
+  /* Detail panel */
+  .ws-detail { width: 256px; border-left: 1px solid var(--border); background: var(--bg-sub); padding: 16px 14px; flex-shrink: 0; overflow-y: auto; }
+  .dp-sec { margin-bottom: 22px; }
+  .dp-lbl { font-size: 10px; font-weight: 600; color: var(--text-3); text-transform: uppercase; letter-spacing: .8px; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+  .v2-badge { font-size: 9px; background: var(--green-d); color: #15803d; border: 1px solid var(--green-b); padding: 1px 5px; border-radius: 3px; font-weight: 600; }
+  .dp-summary { font-size: 12px; color: var(--text-2); line-height: 1.65; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; }
+  .dp-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+  .dp-tag { font-size: 11px; background: var(--bg); color: var(--text-2); border: 1px solid var(--border); border-radius: 5px; padding: 3px 9px; }
+  .dp-link { font-size: 12px; color: var(--blue); padding: 5px 0; display: flex; align-items: center; gap: 6px; border-bottom: 1px solid var(--border-dim); cursor: pointer; }
+  .dp-link:last-child { border-bottom: none; }
+  .dp-meta-row { font-size: 11px; color: var(--text-3); padding: 2px 0; display: flex; align-items: center; gap: 6px; }
+
+  /* Status bar */
+  .ws-status { height: 24px; background: var(--bg-sub); border-top: 1px solid var(--border); display: flex; align-items: center; padding: 0 16px; gap: 18px; flex-shrink: 0; }
+  .st-item { font-size: 10px; color: var(--text-3); display: flex; align-items: center; gap: 4px; font-weight: 500; }
+  .st-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--green); }
+
+  /* ──────────────────────────────────────
+     ④ CONTEXT MENU
+  ────────────────────────────────────── */
+  .ctx-menu {
+    background: var(--bg); border: 1px solid var(--border); border-radius: 10px;
+    box-shadow: var(--shadow-lg); width: 196px; padding: 5px;
+    position: absolute; left: 210px; top: 90px; z-index: 50;
+  }
+  .ctx-item { padding: 7px 10px; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 8px; color: var(--text-2); border-radius: 6px; transition: .1s; }
+  .ctx-item:hover { background: var(--bg-hover); color: var(--text); }
+  .ctx-item.danger:hover { background: #fef2f2; color: var(--red); }
+  .ctx-icon { font-size: 13px; width: 16px; text-align: center; }
+  .ctx-shortcut { margin-left: auto; font-size: 10px; color: var(--text-3); background: var(--bg-sub); padding: 1px 5px; border-radius: 3px; }
+  .ctx-div { border-top: 1px solid var(--border-dim); margin: 3px 0; }
+
+  /* ──────────────────────────────────────
+     ⑤ GRAPH v2
+  ────────────────────────────────────── */
+  .graph-wrap { height: calc(100vh - 46px); display: flex; flex-direction: column; }
+  .graph-hd {
+    height: 48px; background: var(--bg); border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; padding: 0 18px; gap: 12px; box-shadow: var(--shadow-sm);
+  }
+  .graph-back { font-size: 12px; color: var(--text-2); cursor: pointer; display: flex; align-items: center; gap: 4px; font-weight: 500; }
+  .graph-back:hover { color: var(--text); }
+  .graph-title { font-size: 14px; font-weight: 600; }
+  .graph-filters { display: flex; gap: 6px; margin-left: auto; }
+  .gf { border: 1px solid var(--border); border-radius: 20px; padding: 4px 12px; font-size: 11px; cursor: pointer; color: var(--text-2); background: var(--bg); font-weight: 500; transition: .1s; }
+  .gf:hover { border-color: var(--green); color: var(--green); }
+  .gf.on { background: var(--bg-active); border-color: var(--green-b); color: #15803d; }
+  .graph-canvas { flex: 1; background: #f8fffe; position: relative; overflow: hidden; }
+  .graph-legend { position: absolute; bottom: 16px; left: 16px; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; box-shadow: var(--shadow); }
+  .gl-row { display: flex; align-items: center; gap: 8px; padding: 3px 0; font-size: 11px; color: var(--text-2); }
+  .gl-dot { width: 8px; height: 8px; border-radius: 50%; }
+  .graph-help { position: absolute; bottom: 16px; right: 16px; font-size: 10px; color: var(--text-3); background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 5px 10px; }
+
+  /* ──────────────────────────────────────
+     ⑥ REVISION HISTORY
+  ────────────────────────────────────── */
+  .rev-wrap { display: flex; height: calc(100vh - 46px); }
+  .rev-list { width: 300px; border-right: 1px solid var(--border); background: var(--bg-sub); display: flex; flex-direction: column; flex-shrink: 0; }
+  .rev-hd { padding: 16px 18px; border-bottom: 1px solid var(--border); }
+  .rev-hd h3 { font-size: 14px; font-weight: 600; }
+  .rev-hd p { font-size: 11px; color: var(--text-3); margin-top: 2px; }
+  .rev-items { flex: 1; overflow-y: auto; }
+  .rev-item { padding: 12px 16px; border-bottom: 1px solid var(--border-dim); cursor: pointer; transition: .1s; }
+  .rev-item:hover { background: var(--bg-hover); }
+  .rev-item.sel { background: var(--bg-active); border-left: 3px solid var(--green); }
+  .rev-time { font-size: 12px; font-weight: 500; color: var(--text); }
+  .rev-badge { font-size: 10px; display: inline-block; padding: 2px 7px; border-radius: 20px; margin-top: 3px; font-weight: 500; }
+  .rev-badge.auto { background: var(--green-d); color: #15803d; }
+  .rev-badge.manual { background: #eff6ff; color: #1d4ed8; }
+  .rev-size { font-size: 10px; color: var(--text-3); margin-top: 3px; }
+  .rev-preview { flex: 1; background: var(--bg); padding: 28px 36px; overflow-y: auto; }
+  .rev-preview-bar { font-size: 11px; color: var(--text-3); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; padding-bottom: 14px; border-bottom: 1px solid var(--border); }
+  .diff-add { background: #f0fdf4; border-left: 2px solid var(--green); padding: 4px 12px; margin: 2px 0; font-size: 12px; color: #15803d; font-family: monospace; }
+  .diff-del { background: #fef2f2; border-left: 2px solid var(--red); padding: 4px 12px; margin: 2px 0; font-size: 12px; color: #991b1b; font-family: monospace; text-decoration: line-through; }
+  .diff-ctx { padding: 4px 12px; margin: 2px 0; font-size: 12px; color: var(--text-3); font-family: monospace; }
+  .rev-actions { display: flex; gap: 8px; margin-top: 20px; }
+  .btn-restore { padding: 8px 18px; background: var(--green); color: #fff; border: none; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; }
+  .btn-sec { padding: 8px 18px; background: var(--bg); border: 1px solid var(--border); color: var(--text-2); border-radius: 8px; font-size: 12px; cursor: pointer; }
+
+  /* ──────────────────────────────────────
+     ⑨ SLIM TOOLBAR
+  ────────────────────────────────────── */
+  .slim-tb {
+    display: flex; align-items: center; gap: 2px;
+    padding: 5px 14px; border-bottom: 1px solid var(--border);
+    background: var(--bg); height: 36px;
+  }
+  .slim-sep { width: 1px; height: 14px; background: var(--border); margin: 0 4px; }
+  .slim-btn { padding: 3px 6px; border-radius: 5px; border: none; background: transparent; color: var(--text-2); cursor: pointer; font-size: 12px; font-weight: 500; transition: .1s; line-height: 1; }
+  .slim-btn:hover { background: var(--bg-hover); color: var(--text); }
+  .slim-btn.on { background: var(--green-d); color: #15803d; }
+  .slim-sel { background: transparent; border: none; font-size: 12px; color: var(--text-2); padding: 2px 4px; border-radius: 5px; cursor: pointer; outline: none; font-weight: 500; }
+  .slim-sel:hover { background: var(--bg-hover); }
+
+  /* compare */
+  .compare-row { display: flex; gap: 32px; align-items: flex-start; padding: 32px 40px; background: var(--bg-sub); min-height: calc(100vh - 46px); }
+  .compare-box { flex: 1; background: var(--bg); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; box-shadow: var(--shadow-sm); }
+  .compare-label { font-size: 11px; font-weight: 600; color: var(--text-3); padding: 10px 14px; border-bottom: 1px solid var(--border); background: var(--bg-sub); letter-spacing: .4px; display: flex; align-items: center; gap: 6px; }
+  .compare-label .badge { font-size: 10px; background: var(--green-d); color: #15803d; padding: 1px 6px; border-radius: 10px; font-weight: 600; }
+  .default-tb {
+    display: flex; align-items: center; gap: 1px; padding: 6px 12px; border-bottom: 1px solid var(--border); flex-wrap: wrap; background: var(--bg); min-height: 44px;
+  }
+  .compare-content { padding: 20px 22px; }
+  .compare-note { color: var(--text-3); font-size: 11px; line-height: 1.6; padding: 10px 14px; background: var(--bg-active); border-top: 1px solid var(--border-dim); }
+
+  /* ──────────────────────────────────────
+     ⑩ DRAG & DROP
+  ────────────────────────────────────── */
+  .drag-wrap { display: grid; grid-template-columns: repeat(3, 220px) 1fr; gap: 24px; padding: 28px 32px; background: var(--bg-sub); min-height: calc(100vh - 46px); align-items: start; }
+  .drag-panel { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; box-shadow: var(--shadow-sm); }
+  .drag-panel-label { font-size: 11px; font-weight: 600; color: var(--text-3); padding: 10px 14px; border-bottom: 1px solid var(--border); background: var(--bg-sub); letter-spacing: .4px; }
+  .drag-tree { padding: 6px 4px; }
+  /* dragging item */
+  .dti { padding: 5px 8px; display: flex; align-items: center; gap: 5px; border-radius: 6px; margin: 1px 0; font-size: 12px; color: var(--text-2); position: relative; }
+  .dti.dragging { opacity: .4; background: var(--bg-hover); border: 1px dashed var(--border); }
+  .dti.ghost { background: var(--bg-active); border: 1px solid var(--green-b); color: #15803d; opacity: .9; box-shadow: var(--shadow); }
+  /* drop indicator: between */
+  .drop-line { height: 2px; background: var(--green); border-radius: 2px; margin: 2px 8px; position: relative; }
+  .drop-line::before { content: '●'; position: absolute; left: -6px; top: -5px; font-size: 8px; color: var(--green); }
+  /* drop indicator: inside folder */
+  .dti.drop-into { background: var(--bg-active); border: 1.5px solid var(--green); color: #15803d; }
+  .dti.drop-into .dti-fold-icon { color: var(--green); }
+  .dti-handle { color: var(--text-3); font-size: 10px; cursor: grab; padding: 0 2px; }
+  .dti-ind { padding-left: 20px; }
+  .dti-ind2 { padding-left: 38px; }
+  .drag-desc { min-width: 0; }
+  .drag-desc h4 { font-size: 13px; font-weight: 600; margin-bottom: 6px; color: var(--text); }
+  .drag-desc p { font-size: 12px; color: var(--text-2); line-height: 1.65; margin-bottom: 10px; }
+  .drag-desc ul { font-size: 12px; color: var(--text-2); padding-left: 16px; line-height: 1.8; }
+  .drag-desc code { background: var(--bg-sub); border: 1px solid var(--border); border-radius: 4px; padding: 1px 5px; font-family: monospace; font-size: 11px; color: var(--text); }
+  .drag-rule { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; margin-bottom: 12px; box-shadow: var(--shadow-sm); }
+  .drag-rule-title { font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+  .drag-rule-title .icon { font-size: 14px; }
+
+  /* ──────────────────────────────────────
+     ⑦ MODALS
+  ────────────────────────────────────── */
+  .modals-wrap { padding: 36px; background: #f0f2f5; min-height: calc(100vh - 46px); display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start; }
+  .m-card { background: var(--bg); border: 1px solid var(--border); border-radius: 14px; padding: 26px; width: 340px; box-shadow: var(--shadow); }
+  .m-card h3 { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+  .m-sub { font-size: 11px; color: var(--text-3); margin-bottom: 16px; }
+  .m-input { width: 100%; background: var(--bg-sub); border: 1px solid var(--border); border-radius: 8px; padding: 9px 12px; color: var(--text); font-size: 12px; margin-bottom: 16px; outline: none; }
+  .m-input:focus { border-color: var(--green); }
+  .m-warn { font-size: 11px; color: #92400e; background: #fffbeb; border: 1px solid #fde68a; border-radius: 7px; padding: 9px 12px; margin-bottom: 16px; display: flex; align-items: flex-start; gap: 6px; }
+  .m-danger-txt { font-size: 13px; color: var(--text-2); line-height: 1.65; margin-bottom: 16px; }
+  .m-danger-txt strong { color: var(--text); }
+  .m-danger-note { color: var(--red); font-size: 11px; margin-top: 6px; display: block; }
+  .m-actions { display: flex; justify-content: flex-end; gap: 8px; }
+  .btn-cancel { background: var(--bg); border: 1px solid var(--border); border-radius: 7px; padding: 8px 16px; font-size: 12px; cursor: pointer; color: var(--text-2); font-weight: 500; }
+  .btn-primary { background: var(--green); color: #fff; border: none; border-radius: 7px; padding: 8px 16px; font-size: 12px; font-weight: 600; cursor: pointer; }
+  .btn-danger { background: var(--red); color: #fff; border: none; border-radius: 7px; padding: 8px 16px; font-size: 12px; font-weight: 600; cursor: pointer; }
+  .toast { border-radius: 12px; padding: 16px 18px; width: 340px; border: 1px solid; box-shadow: var(--shadow); }
+  .toast.err { background: #fef2f2; border-color: #fca5a5; }
+  .toast.ok { background: #f0fdf4; border-color: var(--green-b); }
+  .toast-title { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+  .toast.err .toast-title { color: var(--red); }
+  .toast.ok .toast-title { color: #15803d; }
+  .toast-body { font-size: 12px; color: var(--text-2); margin-bottom: 14px; line-height: 1.55; }
+  .toast-btns { display: flex; gap: 8px; }
+  .t-btn { font-size: 11px; padding: 5px 12px; border-radius: 6px; cursor: pointer; font-weight: 500; }
+  .t-btn.sec { background: transparent; border: 1px solid var(--border); color: var(--text-2); }
+  .t-btn.pri { background: var(--green); color: #fff; border: none; }
+  .m-lbl { font-size: 10px; color: var(--text-3); text-align: center; margin-top: 8px; letter-spacing: .4px; font-weight: 500; }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<div class="nav">
+  <div class="tab active" onclick="show(0,this)">① 로그인</div>
+  <div class="tab" onclick="show(1,this)">② 레포 선택</div>
+  <div class="tab" onclick="show(2,this)">③ 워크스페이스</div>
+  <div class="tab" onclick="show(3,this)">④ BlockNote 에디터</div>
+  <div class="tab" onclick="show(4,this)">⑤ 컨텍스트 메뉴</div>
+  <div class="tab" onclick="show(5,this)">⑥ 지식그래프 v2</div>
+  <div class="tab" onclick="show(6,this)">⑦ 수정 이력</div>
+  <div class="tab" onclick="show(7,this)">⑧ 모달 / 토스트</div>
+  <div class="tab" onclick="show(8,this)">⑨ 슬림 툴바 비교</div>
+  <div class="tab" onclick="show(9,this)">⑩ 드래그 이동</div>
+</div>
+
+<!-- ① LOGIN -->
+<div class="screen active" id="s0">
+  <div class="login-wrap">
+    <div>
+      <div class="login-card">
+        <div class="login-logo">doho<span>hon</span></div>
+        <div class="login-sub">GitHub 레포를 저장소로 사용하는<br>나만의 지식 관리 앱</div>
+        <button class="btn-gh">
+          <div class="gh-icon"></div>
+          GitHub으로 계속하기
+        </button>
+        <div class="login-divider"><hr><span>또는</span><hr></div>
+        <div class="login-hint">로그인하면 레포 접근 권한이 요청됩니다.<br><a>개인정보처리방침</a> · <a>서비스 약관</a></div>
+      </div>
+      <div class="wf-label">[ WF-01 ] 로그인 — GitHub OAuth 2.0</div>
+    </div>
+  </div>
+</div>
+
+<!-- ② REPO SELECT -->
+<div class="screen" id="s1">
+  <div class="repo-wrap">
+    <div>
+      <div class="repo-card">
+        <h2>레포지터리 연결</h2>
+        <p>노트를 저장할 GitHub 레포를 선택하세요. 이후 헤더에서 변경할 수 있습니다.</p>
+        <input class="repo-search" placeholder="🔍 레포 검색..." readonly>
+        <div class="repo-list">
+          <div class="repo-item sel">◫&nbsp; my-notes<span class="repo-badge">private</span></div>
+          <div class="repo-item">◫&nbsp; knowledge-base<span class="repo-badge">private</span></div>
+          <div class="repo-item">◫&nbsp; public-wiki<span class="repo-badge">public</span></div>
+          <div class="repo-item">◫&nbsp; dev-logs<span class="repo-badge">private</span></div>
+        </div>
+        <div class="repo-banner"><span class="dot"></span>my-notes · v1에서 단일 레포로 운영됩니다</div>
+        <button class="btn-confirm">my-notes 연결하기</button>
+      </div>
+      <div class="wf-label">[ WF-02 ] 레포 선택 — 단일 레포, 최초 진입 시</div>
+    </div>
+  </div>
+</div>
+
+<!-- ③ WORKSPACE -->
+<div class="screen" id="s2">
+  <div class="ws">
+    <div class="ws-hd">
+      <div class="ws-logo">doho<span>hon</span></div>
+      <div class="hd-sep"></div>
+      <div class="repo-pill"><span class="repo-dot"></span>my-notes</div>
+      <div class="ws-sp"></div>
+      <div class="save-pill"><span class="save-dot"></span>저장됨</div>
+      <div class="ws-avatar">K</div>
+    </div>
+    <div class="ws-body">
+      <!-- Sidebar -->
+      <div class="ws-sb">
+        <div class="sb-top">
+          <button class="sb-btn">+ 폴더</button>
+          <button class="sb-btn">+ 노트</button>
+        </div>
+        <div class="sb-search">🔍 <span>검색</span></div>
+        <div class="tree">
+          <div class="ti folder"><span class="arr">▾</span>◫&nbsp;프로젝트</div>
+          <div class="ti-ind">
+            <div class="ti act"><span class="arr"></span>◻&nbsp;아이디어 정리<span class="ti-badge">v2</span></div>
+            <div class="ti"><span class="arr"></span>◻&nbsp;요구사항</div>
+            <div class="ti"><span class="arr">▸</span>◫&nbsp;백로그</div>
+          </div>
+          <div class="ti folder"><span class="arr">▾</span>◫&nbsp;독서</div>
+          <div class="ti-ind">
+            <div class="ti"><span class="arr"></span>◻&nbsp;제로 투 원</div>
+            <div class="ti"><span class="arr"></span>◻&nbsp;아토믹 해빗</div>
+          </div>
+          <div class="ti"><span class="arr"></span>◻&nbsp;루트 노트</div>
+          <div class="ti"><span class="arr"></span>◻&nbsp;일기 2026-06</div>
+        </div>
+      </div>
+      <!-- Editor -->
+      <div class="ws-ed">
+        <div class="ed-tb">
+          <select class="tb-sel"><option>본문</option><option>H1</option><option>H2</option><option>H3</option></select>
+          <div class="tb-sep"></div>
+          <button class="tb-btn"><b>B</b></button>
+          <button class="tb-btn"><i>I</i></button>
+          <button class="tb-btn"><s>S</s></button>
+          <button class="tb-btn">`코드`</button>
+          <div class="tb-sep"></div>
+          <button class="tb-btn">표</button>
+          <button class="tb-btn act">☑</button>
+          <button class="tb-btn">" 인용</button>
+          <button class="tb-btn">{ } 코드블록</button>
+          <div class="tb-sep"></div>
+          <button class="tb-btn">🖼 이미지</button>
+          <div style="flex:1"></div>
+          <button class="tb-btn" style="font-size:11px">이력 보기</button>
+          <button class="tb-btn" style="font-size:11px;color:var(--green);font-weight:600" title="우측 패널 열기/닫기">☰ 패널</button>
+        </div>
+        <div class="ed-body">
+          <input class="note-title" value="아이디어 정리" readonly>
+          <div class="note-meta">
+            <span>생성 2026-06-10</span>
+            <span>수정 방금 전</span>
+            <span>2.4 KB</span>
+          </div>
+          <div class="ed-content">
+            <div class="bn-block"><span class="bn-handle">⠿</span><div class="bn-h2">배경</div></div>
+            <div class="bn-block"><span class="bn-handle">⠿</span>
+              <div class="bn-p">Obsidian의 유기적 연결성과 Notion의 <span class="bn-strong">구조적 문서 관리</span>를 결합한 개인 지식 관리 앱이 필요하다. GitHub 레포를 저장소로 활용하여 데이터 소유권을 확보한다.</div>
+            </div>
+            <div class="bn-block"><span class="bn-handle">⠿</span><div class="bn-quote">핵심은 "내 파일은 내가 소유한다"는 철학</div></div>
+            <div class="bn-block"><span class="bn-handle">⠿</span><div class="bn-h2">기능 체크리스트</div></div>
+            <div class="bn-block"><span class="bn-handle">⠿</span>
+              <ul class="bn-check">
+                <li><span class="bn-box done"></span>폴더/노트 계층 구조</li>
+                <li><span class="bn-box done"></span>BlockNote 리치 에디터 + / 슬래시 메뉴</li>
+                <li><span class="bn-box"></span><span>AI 요약 및 자동 태그 <span class="bn-tag-inline">v2</span></span></li>
+                <li><span class="bn-box"></span><span>지식 그래프 <span class="bn-tag-inline">v2</span></span></li>
+              </ul>
+            </div>
+            <div class="bn-block"><span class="bn-handle">⠿</span><div class="bn-h2">비교 분석</div></div>
+            <div class="bn-block"><span class="bn-handle">⠿</span>
+              <table class="bn-table">
+                <tr><th>항목</th><th>Obsidian</th><th>Notion</th><th>dohohon</th></tr>
+                <tr><td>데이터 소유</td><td style="color:#15803d">✓</td><td style="color:var(--red)">✗</td><td style="color:#15803d">✓</td></tr>
+                <tr><td>웹 접근</td><td style="color:var(--amber)">△</td><td style="color:#15803d">✓</td><td style="color:#15803d">✓</td></tr>
+                <tr><td>/ 슬래시 메뉴</td><td style="color:var(--red)">✗</td><td style="color:#15803d">✓</td><td style="color:#15803d">✓</td></tr>
+              </table>
+            </div>
+            <div class="bn-block"><span class="bn-handle">⠿</span>
+              <div class="bn-img">🖼 이미지를 드래그하거나 클릭해서 삽입<br><span style="font-size:10px;margin-top:4px;display:block">현재 커서 위치에 블록으로 삽입됩니다</span></div>
+            </div>
+          </div>
+        </div>
+        <div style="padding:6px 16px;border-top:1px solid var(--border);font-size:11px;color:var(--text-3);display:flex;gap:16px;background:var(--bg-sub)">
+          <span>342자</span><span>|</span><span>자동저장 완료</span><span>|</span><span>/프로젝트/아이디어 정리.md</span>
+        </div>
+      </div>
+      <!-- Detail Panel — 우측 상단 툴바 '☰ 패널' 버튼으로 슬라이드 열기/닫기 (transition: width .2s) -->
+      <div class="ws-detail">
+        <div style="font-size:10px;color:var(--green);background:var(--green-d);border-radius:6px;padding:4px 8px;margin-bottom:12px;text-align:center">☰ 패널 버튼으로 토글 (v2 전용)</div>
+        <div class="dp-sec">
+          <div class="dp-lbl">AI 요약 <span class="v2-badge">v2</span></div>
+          <div class="dp-summary">Obsidian·Notion을 결합한 GitHub 기반 개인 지식 관리 앱의 기능 및 비교 분석.</div>
+        </div>
+        <div class="dp-sec">
+          <div class="dp-lbl">태그 <span class="v2-badge">v2</span></div>
+          <div class="dp-tags">
+            <span class="dp-tag">#PKM</span><span class="dp-tag">#메모앱</span>
+            <span class="dp-tag">#GitHub</span><span class="dp-tag">#아이디어</span>
+          </div>
+        </div>
+        <div class="dp-sec">
+          <div class="dp-lbl">연결 노트 <span class="v2-badge">v2</span></div>
+          <div class="dp-link">↗ 요구사항</div>
+          <div class="dp-link">↗ 백로그/기능목록</div>
+          <div class="dp-link">↗ 제로 투 원</div>
+        </div>
+        <div class="dp-sec">
+          <div class="dp-lbl">파일 정보</div>
+          <div class="dp-meta-row">📅 생성 2026-06-10</div>
+          <div class="dp-meta-row">✏️ 수정 오늘 09:51</div>
+          <div class="dp-meta-row">📦 2.4 KB</div>
+          <div class="dp-meta-row">🔗 백링크 3개</div>
+        </div>
+      </div>
+    </div>
+    <div class="ws-status">
+      <div class="st-item"><span class="st-dot"></span>GitHub 연결됨</div>
+      <div class="st-item">my-notes · main</div>
+      <div class="st-item" style="margin-left:auto">자동저장 2초 · Cmd+S 수동저장</div>
+    </div>
+  </div>
+  <div class="wf-label">[ WF-03 ] 메인 워크스페이스</div>
+</div>
+
+<!-- ④ BLOCKNOTE EDITOR -->
+<div class="screen" id="s3">
+  <div class="ws">
+    <div class="ws-hd">
+      <div class="ws-logo">doho<span>hon</span></div>
+      <div class="ws-sp"></div>
+      <div class="save-pill saving"><span class="save-dot"></span>저장 중...</div>
+    </div>
+    <div class="ws-body">
+      <div class="ws-sb">
+        <div class="sb-top"><button class="sb-btn">+ 폴더</button><button class="sb-btn">+ 노트</button></div>
+        <div class="tree">
+          <div class="ti folder"><span class="arr">▾</span>◫&nbsp;프로젝트</div>
+          <div class="ti-ind"><div class="ti act"><span class="arr"></span>◻&nbsp;아이디어 정리</div></div>
+        </div>
+      </div>
+      <div class="ws-ed" style="overflow:visible;position:relative">
+        <div class="ed-tb">
+          <select class="tb-sel"><option>본문</option></select>
+          <div class="tb-sep"></div>
+          <button class="tb-btn"><b>B</b></button>
+          <button class="tb-btn"><i>I</i></button>
+          <div class="tb-sep"></div>
+          <button class="tb-btn">표</button>
+          <button class="tb-btn">☑</button>
+        </div>
+        <div class="ed-body" style="position:relative">
+          <input class="note-title" value="아이디어 정리" readonly>
+          <div class="note-meta"><span>수정 방금 전</span></div>
+          <div class="ed-content">
+            <div class="bn-p">이 아래에서 <strong>/</strong>를 입력하면 블록 삽입 메뉴가 나타납니다.</div>
+            <div class="bn-p" style="color:var(--text-3)">/&nbsp;<span style="border-bottom:2px solid var(--green)">&nbsp;&nbsp;&nbsp;&nbsp;</span></div>
+
+            <!-- Slash menu -->
+            <div class="slash-menu">
+              <div class="slash-label">기본 블록</div>
+              <div class="slash-item sel">
+                <div class="slash-icon">H2</div>
+                <div class="slash-info"><span class="slash-name">제목 2</span><span class="slash-desc">중간 크기 섹션 제목</span></div>
+              </div>
+              <div class="slash-item">
+                <div class="slash-icon">H3</div>
+                <div class="slash-info"><span class="slash-name">제목 3</span><span class="slash-desc">작은 섹션 제목</span></div>
+              </div>
+              <div class="slash-item">
+                <div class="slash-icon">☑</div>
+                <div class="slash-info"><span class="slash-name">체크리스트</span><span class="slash-desc">할 일 목록</span></div>
+              </div>
+              <div class="slash-item">
+                <div class="slash-icon">⊞</div>
+                <div class="slash-info"><span class="slash-name">표</span><span class="slash-desc">행과 열로 구성된 표</span></div>
+              </div>
+              <div class="slash-item">
+                <div class="slash-icon">{ }</div>
+                <div class="slash-info"><span class="slash-name">코드 블록</span><span class="slash-desc">코드 입력</span></div>
+              </div>
+              <div class="slash-item">
+                <div class="slash-icon">🖼</div>
+                <div class="slash-info"><span class="slash-name">이미지</span><span class="slash-desc">이미지 업로드 또는 URL</span></div>
+              </div>
+              <div class="slash-label" style="margin-top:6px">v2</div>
+              <div class="slash-item">
+                <div class="slash-icon" style="font-size:11px">[[</div>
+                <div class="slash-info"><span class="slash-name">백링크</span><span class="slash-desc">다른 노트 연결</span></div>
+              </div>
+            </div>
+
+            <!-- Inline toolbar example -->
+            <div style="margin-top:20px">
+              <div class="bn-p">텍스트를 드래그하여 선택하면 인라인 툴바가 나타납니다:</div>
+              <div style="display:inline;background:#e0f2fe;border-radius:3px;padding:2px 0">선택된 텍스트 예시</div>
+              <div class="inline-tb" style="margin-top:8px;display:inline-flex">
+                <button class="it-btn"><b>B</b></button>
+                <button class="it-btn"><i>I</i></button>
+                <button class="it-btn"><s>S</s></button>
+                <div class="it-sep"></div>
+                <button class="it-btn">🔗</button>
+                <button class="it-btn" style="color:var(--green)">A</button>
+                <div class="it-sep"></div>
+                <button class="it-btn">⋯</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="wf-label">[ WF-04 ] BlockNote 에디터 — / 슬래시 메뉴 & 인라인 툴바</div>
+</div>
+
+<!-- ⑤ CONTEXT MENU -->
+<div class="screen" id="s4">
+  <div class="ws" style="position:relative">
+    <div class="ws-hd">
+      <div class="ws-logo">doho<span>hon</span></div>
+      <div class="ws-sp"></div>
+      <div class="save-pill"><span class="save-dot"></span>저장됨</div>
+    </div>
+    <div class="ws-body" style="position:relative">
+      <!-- Sidebar — context menu pops out from here -->
+      <div class="ws-sb" style="position:relative;overflow:visible;z-index:10">
+        <div class="sb-top"><button class="sb-btn">+ 폴더</button><button class="sb-btn">+ 노트</button></div>
+        <div class="sb-search">🔍 <span>검색</span></div>
+        <div class="tree" style="overflow:visible">
+          <div class="ti folder"><span class="arr">▾</span>◫&nbsp;프로젝트</div>
+          <div class="ti-ind" style="overflow:visible">
+            <!-- 우클릭된 아이템 — 하이라이트 -->
+            <div class="ti" style="background:var(--bg-active);color:#15803d;position:relative">
+              <span class="arr"></span>◻&nbsp;아이디어 정리
+              <span style="font-size:9px;color:var(--green);margin-left:4px">← 우클릭</span>
+              <!-- context menu anchored to RIGHT of this item -->
+              <div class="ctx-menu" style="position:absolute;left:calc(100% + 4px);top:0;z-index:100">
+                <div class="ctx-item"><span class="ctx-icon">◻</span>새 노트<span class="ctx-shortcut">N</span></div>
+                <div class="ctx-item"><span class="ctx-icon">◫</span>새 폴더<span class="ctx-shortcut">⇧N</span></div>
+                <div class="ctx-div"></div>
+                <div class="ctx-item"><span class="ctx-icon">✎</span>이름 변경<span class="ctx-shortcut">F2</span></div>
+                <div class="ctx-item"><span class="ctx-icon">ℹ</span>상세 정보</div>
+                <div class="ctx-item"><span class="ctx-icon">⎘</span>경로 복사</div>
+                <div class="ctx-div"></div>
+                <div class="ctx-item danger"><span class="ctx-icon">⌫</span>삭제<span class="ctx-shortcut">Del</span></div>
+              </div>
+            </div>
+            <div class="ti"><span class="arr"></span>◻&nbsp;요구사항</div>
+            <div class="ti"><span class="arr">▸</span>◫&nbsp;백로그</div>
+          </div>
+          <div class="ti folder"><span class="arr">▾</span>◫&nbsp;독서</div>
+          <div class="ti-ind">
+            <div class="ti"><span class="arr"></span>◻&nbsp;제로 투 원</div>
+          </div>
+          <div class="ti"><span class="arr"></span>◻&nbsp;루트 노트</div>
+        </div>
+      </div>
+      <div class="ws-ed">
+        <div class="ed-tb">
+          <select class="tb-sel"><option>본문</option></select>
+          <div class="tb-sep"></div>
+          <button class="tb-btn"><b>B</b></button>
+          <button class="tb-btn"><i>I</i></button>
+        </div>
+        <div style="padding:40px 56px">
+          <div style="font-size:22px;font-weight:700;color:var(--text);margin-bottom:12px">아이디어 정리</div>
+          <div style="font-size:13px;color:var(--text-3);line-height:1.8">← 사이드바 항목을 우클릭하면<br>해당 아이템 바로 오른쪽에 메뉴가 나타납니다.</div>
+          <div style="margin-top:20px;font-size:12px;color:var(--text-3);background:var(--bg-sub);border-radius:8px;padding:12px 14px;border:1px solid var(--border)">
+            <strong style="color:var(--text-2)">위치 계산 로직</strong><br>
+            우클릭 시 <code style="background:var(--bg);border:1px solid var(--border);border-radius:3px;padding:1px 5px;font-family:monospace;font-size:11px">e.clientX, e.clientY</code> 좌표 기준<br>
+            오른쪽 공간 부족 → 왼쪽으로 자동 반전<br>
+            하단 공간 부족 → 위쪽으로 자동 반전
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="wf-label">[ WF-05 ] 컨텍스트 메뉴 — 우클릭한 아이템 바로 옆에 표시</div>
+</div>
+
+<!-- ⑥ GRAPH v2 -->
+<div class="screen" id="s5">
+  <div class="graph-wrap">
+    <div class="graph-hd">
+      <div class="graph-back">← 워크스페이스</div>
+      <div class="graph-title">지식 그래프</div>
+      <span class="v2-badge">v2</span>
+      <div class="graph-filters">
+        <div class="gf on">전체</div>
+        <div class="gf">#PKM</div>
+        <div class="gf">#독서</div>
+        <div class="gf">#메모앱</div>
+      </div>
+    </div>
+    <div class="graph-canvas">
+      <svg width="100%" height="100%">
+        <defs>
+          <marker id="ah" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+            <path d="M0,0 L6,3 L0,6 Z" fill="#d1d5db"/>
+          </marker>
+        </defs>
+        <line x1="420" y1="255" x2="268" y2="175" stroke="#d1d5db" stroke-width="1.5" marker-end="url(#ah)"/>
+        <line x1="420" y1="255" x2="578" y2="162" stroke="#d1d5db" stroke-width="1.5"/>
+        <line x1="420" y1="255" x2="308" y2="368" stroke="#d1d5db" stroke-width="1.5"/>
+        <line x1="420" y1="255" x2="543" y2="368" stroke="#d1d5db" stroke-width="1.5"/>
+        <line x1="268" y1="175" x2="158" y2="98" stroke="#e5e7eb" stroke-width="1"/>
+        <line x1="578" y1="162" x2="690" y2="94" stroke="#e5e7eb" stroke-width="1"/>
+        <line x1="308" y1="368" x2="195" y2="444" stroke="#e5e7eb" stroke-width="1"/>
+
+        <circle cx="420" cy="255" r="32" fill="#f0fdf4" stroke="#22c55e" stroke-width="2"/>
+        <text x="420" y="250" text-anchor="middle" fill="#15803d" font-size="10" font-weight="700">아이디어</text>
+        <text x="420" y="264" text-anchor="middle" fill="#15803d" font-size="10" font-weight="700">정리</text>
+
+        <circle cx="268" cy="175" r="22" fill="#f5f3ff" stroke="#8b5cf6" stroke-width="1.5"/>
+        <text x="268" y="179" text-anchor="middle" fill="#6d28d9" font-size="9" font-weight="600">요구사항</text>
+
+        <circle cx="578" cy="162" r="20" fill="#f0fdf4" stroke="#22c55e" stroke-width="1.5" opacity=".8"/>
+        <text x="578" y="166" text-anchor="middle" fill="#15803d" font-size="9">제로투원</text>
+
+        <circle cx="308" cy="368" r="18" fill="#fffbeb" stroke="#f59e0b" stroke-width="1.5" opacity=".85"/>
+        <text x="308" y="372" text-anchor="middle" fill="#92400e" font-size="9">백로그</text>
+
+        <circle cx="543" cy="368" r="17" fill="#fef2f2" stroke="#ef4444" stroke-width="1.5" opacity=".75"/>
+        <text x="543" y="372" text-anchor="middle" fill="#991b1b" font-size="9">일기</text>
+
+        <circle cx="158" cy="98" r="14" fill="#f5f3ff" stroke="#8b5cf6" stroke-width="1" opacity=".7"/>
+        <text x="158" y="102" text-anchor="middle" fill="#6d28d9" font-size="8">기능명세</text>
+
+        <circle cx="690" cy="94" r="14" fill="#f0fdf4" stroke="#22c55e" stroke-width="1" opacity=".7"/>
+        <text x="690" y="98" text-anchor="middle" fill="#15803d" font-size="8">독서노트</text>
+
+        <circle cx="195" cy="444" r="12" fill="#fffbeb" stroke="#f59e0b" stroke-width="1" opacity=".65"/>
+        <text x="195" y="448" text-anchor="middle" fill="#92400e" font-size="7">스프린트</text>
+      </svg>
+      <div class="graph-legend">
+        <div class="gl-row"><span class="gl-dot" style="background:#22c55e"></span>#PKM</div>
+        <div class="gl-row"><span class="gl-dot" style="background:#8b5cf6"></span>#메모앱</div>
+        <div class="gl-row"><span class="gl-dot" style="background:#f59e0b"></span>#할일</div>
+        <div class="gl-row"><span class="gl-dot" style="background:#ef4444"></span>#일기</div>
+      </div>
+      <div class="graph-help">스크롤: 줌 · 드래그: 이동 · 클릭: 노트 열기</div>
+    </div>
+  </div>
+  <div class="wf-label">[ WF-06 ] 지식 그래프 (v2) — D3 force-directed</div>
+</div>
+
+<!-- ⑦ REVISION HISTORY -->
+<div class="screen" id="s6">
+  <div class="rev-wrap">
+    <div class="rev-list">
+      <div class="rev-hd">
+        <h3>수정 이력</h3>
+        <p>아이디어 정리.md</p>
+      </div>
+      <div class="rev-items">
+        <div class="rev-item sel">
+          <div class="rev-time">오늘 09:51</div>
+          <div><span class="rev-badge auto">자동저장</span></div>
+          <div class="rev-size">+3줄 · 2.4 KB</div>
+        </div>
+        <div class="rev-item">
+          <div class="rev-time">오늘 09:42</div>
+          <div><span class="rev-badge manual">수동저장 (Cmd+S)</span></div>
+          <div class="rev-size">+12줄 · 2.1 KB</div>
+        </div>
+        <div class="rev-item">
+          <div class="rev-time">어제 22:15</div>
+          <div><span class="rev-badge auto">자동저장</span></div>
+          <div class="rev-size">-2줄 · 1.9 KB</div>
+        </div>
+        <div class="rev-item">
+          <div class="rev-time">어제 21:03</div>
+          <div><span class="rev-badge manual">수동저장 (Cmd+S)</span></div>
+          <div class="rev-size">+28줄 · 2.1 KB</div>
+        </div>
+        <div class="rev-item">
+          <div class="rev-time">2026-06-15 14:22</div>
+          <div><span class="rev-badge auto">첫 생성</span></div>
+          <div class="rev-size">0.1 KB</div>
+        </div>
+      </div>
+    </div>
+    <div class="rev-preview">
+      <div class="rev-preview-bar">
+        오늘 09:51 자동저장 · 이전 버전과 비교
+      </div>
+      <div class="diff-ctx">  ## 기능 체크리스트</div>
+      <div class="diff-ctx">  - [x] 폴더/노트 계층 구조</div>
+      <div class="diff-del">- - [ ] 마크다운 에디터</div>
+      <div class="diff-add">+ - [x] BlockNote 리치 에디터 + / 슬래시 메뉴</div>
+      <div class="diff-ctx">  - [ ] AI 요약 및 자동 태그</div>
+      <div class="diff-add">+ - [ ] 지식 그래프 (v2)</div>
+      <div class="diff-ctx">  </div>
+      <div class="diff-del">- ## 비교</div>
+      <div class="diff-add">+ ## 비교 분석</div>
+      <div class="rev-actions">
+        <button class="btn-restore">이 버전으로 복원</button>
+        <button class="btn-sec">커밋 링크 복사</button>
+      </div>
+    </div>
+  </div>
+  <div class="wf-label">[ WF-07 ] 수정 이력 — GitHub Commits 기반 diff 뷰</div>
+</div>
+
+<!-- ⑧ MODALS -->
+<div class="screen" id="s7">
+  <div class="modals-wrap">
+
+    <div>
+      <div class="m-card">
+        <h3>새 노트 만들기</h3>
+        <div class="m-sub">위치: /프로젝트/</div>
+        <input class="m-input" value="새 아이디어">
+        <div class="m-actions">
+          <button class="btn-cancel">취소</button>
+          <button class="btn-primary">만들기</button>
+        </div>
+      </div>
+      <div class="m-lbl">[ WF-08a ] 노트 생성</div>
+    </div>
+
+    <div>
+      <div class="m-card">
+        <h3>이름 변경</h3>
+        <div class="m-sub">/프로젝트/아이디어 정리.md</div>
+        <input class="m-input" value="아이디어 정리">
+        <div class="m-warn">⚠ 연결된 백링크가 자동으로 업데이트됩니다 (v2)</div>
+        <div class="m-actions">
+          <button class="btn-cancel">취소</button>
+          <button class="btn-primary">변경</button>
+        </div>
+      </div>
+      <div class="m-lbl">[ WF-08b ] 이름 변경</div>
+    </div>
+
+    <div>
+      <div class="m-card">
+        <h3>노트 삭제</h3>
+        <div class="m-danger-txt">
+          <strong>"아이디어 정리.md"</strong>를 삭제하시겠습니까?
+          <span class="m-danger-note">GitHub에서 파일이 삭제됩니다. 복구 시 Git 이력을 이용하세요.</span>
+        </div>
+        <div class="m-actions">
+          <button class="btn-cancel">취소</button>
+          <button class="btn-danger">삭제</button>
+        </div>
+      </div>
+      <div class="m-lbl">[ WF-08c ] 삭제 확인</div>
+    </div>
+
+    <div>
+      <div class="toast err">
+        <div class="toast-title">⚠ 저장 실패</div>
+        <div class="toast-body">GitHub API 요청이 실패했습니다.<br>네트워크 연결을 확인해주세요.</div>
+        <div class="toast-btns">
+          <button class="t-btn sec">무시</button>
+          <button class="t-btn pri">재시도</button>
+        </div>
+      </div>
+      <div class="m-lbl">[ WF-08d ] 저장 실패 토스트</div>
+    </div>
+
+    <div>
+      <div class="toast ok">
+        <div class="toast-title">✓ 복원 완료</div>
+        <div class="toast-body">09:42 버전으로 복원되었습니다.<br>현재 내용은 이력에 저장되었습니다.</div>
+        <div class="toast-btns">
+          <button class="t-btn sec">닫기</button>
+        </div>
+      </div>
+      <div class="m-lbl">[ WF-08e ] 복원 완료 토스트</div>
+    </div>
+
+    <div>
+      <div class="m-card">
+        <h3>📄 아이디어 정리</h3>
+        <div class="m-sub">/프로젝트/아이디어 정리.md</div>
+        <div style="display:grid;gap:5px;margin-bottom:18px">
+          <div class="dp-meta-row">📅 생성 2026-06-10 14:22</div>
+          <div class="dp-meta-row">✏️ 수정 2026-06-17 09:51</div>
+          <div class="dp-meta-row">📦 2.4 KB</div>
+          <div class="dp-meta-row">🔗 백링크 3개 <span class="v2-badge">v2</span></div>
+          <div class="dp-meta-row">🏷 #PKM, #메모앱 <span class="v2-badge">v2</span></div>
+        </div>
+        <div class="m-actions"><button class="btn-primary">닫기</button></div>
+      </div>
+      <div class="m-lbl">[ WF-08f ] 상세 정보</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ⑨ INLINE TOOLBAR COMPARE -->
+<div class="screen" id="s8">
+  <div style="padding:32px 48px;background:var(--bg-sub);min-height:calc(100vh - 46px)">
+
+    <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px">인라인 툴바 — 텍스트 드래그 선택 시 선택 영역 <em>위</em>에 플로팅 표시</div>
+    <div style="font-size:12px;color:var(--text-3);margin-bottom:28px">고정 상단 바와는 별개. 텍스트를 드래그하면 선택 부분 위에 자동으로 나타났다가 클릭 해제 시 사라짐.</div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px;max-width:960px;margin:0 auto">
+
+      <!-- LEFT: default -->
+      <div>
+        <div style="font-size:11px;font-weight:600;color:var(--text-3);letter-spacing:.4px;margin-bottom:10px">기본값 (BlockNote default) — 버튼 13개</div>
+        <div style="background:var(--bg);border:1px solid var(--border);border-radius:12px;overflow:hidden;box-shadow:var(--shadow)">
+          <!-- editor body only — no top bar to keep it compact -->
+          <div style="padding:20px 24px;position:relative">
+            <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:10px">아이디어 정리</div>
+            <div style="font-size:12px;color:var(--text-2);line-height:1.7">Obsidian의 유기적 연결성과 Notion의</div>
+            <!-- selection + floating toolbar above -->
+            <div style="position:relative;display:inline-block;margin-top:6px;padding-top:52px">
+              <!-- the floating inline toolbar (white) -->
+              <div style="position:absolute;top:0;left:50%;transform:translateX(-50%);display:inline-flex;align-items:center;gap:1px;background:#fff;border:1px solid var(--border);border-radius:8px;padding:4px 5px;box-shadow:var(--shadow-lg);white-space:nowrap;z-index:10">
+                <div style="display:flex;align-items:center;gap:1px;padding:2px 5px;border-radius:5px;background:var(--bg-sub);border:1px solid var(--border)">
+                  <span style="font-size:11px;color:var(--text-2)">본문</span><span style="font-size:9px;color:var(--text-3)">▾</span>
+                </div>
+                <div style="width:1px;height:12px;background:var(--border);margin:0 2px"></div>
+                <button style="padding:3px 5px;border-radius:4px;border:none;background:transparent;color:var(--text-2);font-size:11px;font-weight:700"><b>B</b></button>
+                <button style="padding:3px 5px;border-radius:4px;border:none;background:transparent;color:var(--text-2);font-size:11px;font-style:italic"><i>I</i></button>
+                <button style="padding:3px 5px;border-radius:4px;border:none;background:transparent;color:var(--text-2);font-size:11px"><u>U</u></button>
+                <button style="padding:3px 5px;border-radius:4px;border:none;background:transparent;color:var(--text-2);font-size:11px"><s>S</s></button>
+                <button style="padding:3px 5px;border-radius:4px;border:none;background:transparent;color:var(--text-2);font-size:10px">`</button>
+                <div style="width:1px;height:12px;background:var(--border);margin:0 2px"></div>
+                <button style="padding:3px 4px;border-radius:4px;border:none;background:transparent;color:var(--text-2);font-size:10px">≡</button>
+                <button style="padding:3px 4px;border-radius:4px;border:none;background:transparent;color:var(--text-2);font-size:10px">≡</button>
+                <button style="padding:3px 4px;border-radius:4px;border:none;background:transparent;color:var(--text-2);font-size:10px">≡</button>
+                <div style="width:1px;height:12px;background:var(--border);margin:0 2px"></div>
+                <button style="padding:3px 5px;border-radius:4px;border:none;background:transparent;color:var(--text-2);font-size:10px">A▾</button>
+                <button style="padding:3px 5px;border-radius:4px;border:none;background:transparent;color:var(--text-2);font-size:10px">🔗</button>
+                <button style="padding:3px 4px;border-radius:4px;border:none;background:transparent;color:var(--text-3);font-size:10px">⋯</button>
+              </div>
+              <!-- caret arrow -->
+              <div style="position:absolute;top:40px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:5px solid var(--border)"></div>
+              <!-- selected text highlight -->
+              <span style="background:#bfdbfe;border-radius:2px;font-size:12px;color:var(--text-2);padding:1px 0;line-height:1.7">구조적 문서 관리를 결합한</span>
+            </div>
+            <div style="font-size:12px;color:var(--text-2);line-height:1.7;display:inline"> 개인 지식 관리 앱.</div>
+          </div>
+        </div>
+        <div style="font-size:11px;color:var(--text-3);margin-top:8px;padding:0 4px">버튼 13개 · 넓어서 좁은 화면에서 불편</div>
+      </div>
+
+      <!-- RIGHT: slim (recommended) -->
+      <div>
+        <div style="font-size:11px;font-weight:600;letter-spacing:.4px;margin-bottom:10px">
+          <span style="color:#15803d">슬림 버전</span>
+          <span style="background:var(--green-d);color:#15803d;border:1px solid var(--green-b);border-radius:10px;padding:1px 8px;font-size:10px;margin-left:6px">권장</span>
+          <span style="color:var(--text-3);font-weight:400;margin-left:6px">— 버튼 5개</span>
+        </div>
+        <div style="background:var(--bg);border:1px solid #86efac;border-radius:12px;overflow:hidden;box-shadow:var(--shadow)">
+          <!-- editor body only -->
+          <div style="padding:20px 24px;position:relative">
+            <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:10px">아이디어 정리</div>
+            <div style="font-size:12px;color:var(--text-2);line-height:1.7">Obsidian의 유기적 연결성과 Notion의</div>
+            <!-- selection + SLIM floating toolbar above -->
+            <div style="position:relative;display:inline-block;margin-top:6px;padding-top:44px">
+              <!-- the slim floating toolbar (white) -->
+              <div style="position:absolute;top:0;left:50%;transform:translateX(-50%);display:inline-flex;align-items:center;gap:1px;background:#fff;border:1px solid var(--border);border-radius:8px;padding:4px 6px;box-shadow:var(--shadow-lg);white-space:nowrap;z-index:10">
+                <button style="padding:3px 7px;border-radius:5px;border:none;background:transparent;color:var(--text);font-size:12px;font-weight:700"><b>B</b></button>
+                <button style="padding:3px 7px;border-radius:5px;border:none;background:var(--bg-hover);color:var(--text);font-size:12px;font-style:italic"><i>I</i></button>
+                <button style="padding:3px 7px;border-radius:5px;border:none;background:transparent;color:var(--text-2);font-size:12px"><s>S</s></button>
+                <button style="padding:3px 7px;border-radius:5px;border:none;background:transparent;color:var(--text-2);font-size:11px">`</button>
+                <div style="width:1px;height:12px;background:var(--border);margin:0 2px"></div>
+                <button style="padding:3px 7px;border-radius:5px;border:none;background:transparent;color:var(--text-2);font-size:12px">🔗</button>
+              </div>
+              <!-- caret arrow -->
+              <div style="position:absolute;top:33px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:5px solid var(--border)"></div>
+              <!-- selected text highlight -->
+              <span style="background:#bfdbfe;border-radius:2px;font-size:12px;color:var(--text-2);padding:1px 0;line-height:1.7">구조적 문서 관리를 결합한</span>
+            </div>
+            <div style="font-size:12px;color:var(--text-2);line-height:1.7;display:inline"> 개인 지식 관리 앱.</div>
+          </div>
+        </div>
+        <div style="font-size:11px;color:#15803d;margin-top:8px;padding:0 4px">버튼 5개 · 컴팩트 · 나머지 서식은 / 슬래시로</div>
+      </div>
+
+    </div>
+
+    <!-- code snippet -->
+    <div style="max-width:960px;margin:24px auto 0;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:16px 20px;font-family:monospace;font-size:11px;color:#374151;line-height:1.8">
+      <span style="color:var(--text-3)">// FormattingToolbarController로 슬림 버전 구현</span><br>
+      &lt;BlockNoteView editor={editor} <span style="color:#7c3aed">formattingToolbar</span>={<span style="color:#d97706">false</span>}&gt;<br>
+      &nbsp;&nbsp;&lt;FormattingToolbarController formattingToolbar={() =&gt; (<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&lt;FormattingToolbar&gt;<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;BasicTextStyleButton basicTextStyle=<span style="color:#16a34a">"bold"</span> /&gt;&nbsp;&nbsp;
+      &lt;BasicTextStyleButton basicTextStyle=<span style="color:#16a34a">"italic"</span> /&gt;&nbsp;&nbsp;
+      &lt;BasicTextStyleButton basicTextStyle=<span style="color:#16a34a">"strike"</span> /&gt;&nbsp;&nbsp;
+      &lt;BasicTextStyleButton basicTextStyle=<span style="color:#16a34a">"code"</span> /&gt;&nbsp;&nbsp;
+      &lt;CreateLinkButton /&gt;<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&lt;/FormattingToolbar&gt;<br>
+      &nbsp;&nbsp;)} /&gt;<br>
+      &lt;/BlockNoteView&gt;
+    </div>
+
+  </div>
+  <div class="wf-label">[ WF-09 ] 인라인 툴바 — 텍스트 선택 시 플로팅 표시 / 기본(13개) vs 슬림(5개) 비교</div>
+</div>
+
+<!-- ⑩ DRAG & DROP -->
+<div class="screen" id="s9">
+  <div class="drag-wrap">
+
+    <!-- Case 1: 사이 삽입 -->
+    <div>
+      <div class="drag-panel">
+        <div class="drag-panel-label">Case A — 아이템 사이에 드롭 (순서 변경)</div>
+        <div class="drag-tree">
+          <div class="dti folder"><span class="dti-handle">⠿</span>◫&nbsp;프로젝트</div>
+          <div class="dti-ind">
+            <div class="dti"><span class="dti-handle">⠿</span>◻&nbsp;요구사항</div>
+            <!-- drop line between -->
+            <div class="drop-line"></div>
+            <div class="dti ghost"><span class="dti-handle">⠿</span>◻&nbsp;아이디어 정리 <span style="font-size:10px;margin-left:4px;color:#15803d">(이동 중)</span></div>
+            <div class="dti" style="opacity:.5"><span class="dti-handle">⠿</span>◻&nbsp;백로그</div>
+          </div>
+          <div class="dti folder"><span class="dti-handle">⠿</span>◫&nbsp;독서</div>
+          <div class="dti"><span class="dti-handle">⠿</span>◻&nbsp;루트 노트</div>
+        </div>
+      </div>
+      <div style="font-size:11px;color:var(--text-3);margin-top:8px;text-align:center;max-width:240px">
+        아이템 <strong>사이 공간</strong>에 드롭<br>→ 같은 레벨에서 순서 변경
+      </div>
+    </div>
+
+    <!-- Case 2: 폴더 안으로 -->
+    <div>
+      <div class="drag-panel">
+        <div class="drag-panel-label">Case B — 폴더 위에 드롭 (하위로 이동)</div>
+        <div class="drag-tree">
+          <div class="dti folder"><span class="dti-handle">⠿</span>◫&nbsp;프로젝트</div>
+          <div class="dti-ind">
+            <div class="dti"><span class="dti-handle">⠿</span>◻&nbsp;요구사항</div>
+            <div class="dti"><span class="dti-handle">⠿</span>◻&nbsp;백로그</div>
+          </div>
+          <!-- folder highlighted as drop target -->
+          <div class="dti folder drop-into"><span class="dti-handle">⠿</span><span class="dti-fold-icon">◫</span>&nbsp;독서 <span style="font-size:10px;margin-left:4px;color:var(--green)">← 여기로 이동</span></div>
+          <div class="dti-ind">
+            <div class="dti"><span class="dti-handle">⠿</span>◻&nbsp;제로 투 원</div>
+          </div>
+          <div class="dti ghost" style="margin-left:20px"><span class="dti-handle">⠿</span>◻&nbsp;아이디어 정리</div>
+          <div class="dti" style="opacity:.5"><span class="dti-handle">⠿</span>◻&nbsp;루트 노트</div>
+        </div>
+      </div>
+      <div style="font-size:11px;color:var(--text-3);margin-top:8px;text-align:center;max-width:240px">
+        <strong>폴더 위</strong>에 드롭 (1초 호버)<br>→ 폴더 열리며 하위로 이동
+      </div>
+    </div>
+
+    <!-- Case 3: 폴더 자체 이동 -->
+    <div>
+      <div class="drag-panel">
+        <div class="drag-panel-label">Case C — 폴더 이동 (하위 전체 함께)</div>
+        <div class="drag-tree">
+          <div class="dti folder dragging"><span class="dti-handle">⠿</span>◫&nbsp;프로젝트 (드래그 중)</div>
+          <div class="dti-ind" style="opacity:.4">
+            <div class="dti"><span class="dti-handle">⠿</span>◻&nbsp;요구사항</div>
+            <div class="dti"><span class="dti-handle">⠿</span>◻&nbsp;아이디어 정리</div>
+          </div>
+          <div class="dti folder drop-into"><span class="dti-handle">⠿</span><span class="dti-fold-icon">◫</span>&nbsp;독서 <span style="font-size:10px;margin-left:4px;color:var(--green)">← 하위로</span></div>
+          <div class="dti-ind">
+            <div class="dti"><span class="dti-handle">⠿</span>◻&nbsp;제로 투 원</div>
+          </div>
+          <div class="dti ghost" style="margin-left:20px"><span class="dti-handle">⠿</span>◫&nbsp;프로젝트</div>
+          <div class="dti-ind2" style="opacity:.6">
+            <div class="dti"><span class="dti-handle">⠿</span>◻&nbsp;요구사항</div>
+          </div>
+        </div>
+      </div>
+      <div style="font-size:11px;color:var(--text-3);margin-top:8px;text-align:center;max-width:240px">
+        폴더 드래그 → 하위 파일 <strong>전체 경로 일괄 변경</strong><br>GitHub API 병렬 요청
+      </div>
+    </div>
+
+    <!-- Rules -->
+    <div class="drag-desc">
+      <h4>드래그 인터랙션 규칙</h4>
+
+      <div class="drag-rule">
+        <div class="drag-rule-title"><span class="icon">⠿</span>드래그 시작</div>
+        <p>왼쪽 핸들(<code>⠿</code>)을 클릭 후 드래그.<br>드래그 중 원본 아이템은 반투명(opacity 40%)으로 표시.</p>
+      </div>
+
+      <div class="drag-rule">
+        <div class="drag-rule-title"><span class="icon">—</span>사이 공간 드롭 (Case A)</div>
+        <p>아이템과 아이템 사이 <code>2px 녹색 선</code>이 나타남.<br>드롭 시 해당 위치로 순서 변경.</p>
+      </div>
+
+      <div class="drag-rule">
+        <div class="drag-rule-title"><span class="icon">◫</span>폴더 위 호버 (Case B)</div>
+        <p>폴더 위 <code>800ms 호버</code> 시 폴더 자동 열기.<br>폴더 배경 녹색 하이라이트 → 드롭 시 하위로 이동.</p>
+      </div>
+
+      <div class="drag-rule">
+        <div class="drag-rule-title" style="color:var(--red)"><span class="icon">✕</span>차단 케이스</div>
+        <ul>
+          <li>폴더를 자기 자신 하위에 드롭 → 차단</li>
+          <li>현재 위치와 동일한 곳에 드롭 → 무동작</li>
+          <li>드래그 취소(Esc) → 원위치 복원</li>
+        </ul>
+      </div>
+
+      <div class="drag-rule">
+        <div class="drag-rule-title"><span class="icon">↻</span>실패 처리</div>
+        <p>Optimistic UI (즉시 트리에 반영) → GitHub API 실패 시 원상복구 + 에러 토스트.</p>
+      </div>
+    </div>
+
+  </div>
+  <div class="wf-label">[ WF-10 ] 드래그앤드롭 — Case A 순서변경 / Case B·C 폴더 이동</div>
+</div>
+
+<script>
+function show(i, el) {
+  document.querySelectorAll('.screen').forEach((s,j)=>s.classList.toggle('active',i===j));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+}
+</script>
+</body>
+</html>
