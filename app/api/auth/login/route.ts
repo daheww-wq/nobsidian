@@ -1,16 +1,19 @@
 import { NextResponse } from 'next/server';
 import { randomBytes } from 'crypto';
 
+const stripBOM = (s: string) => s.replace(/^﻿/, '');
+
 export function GET() {
   const state = randomBytes(16).toString('hex');
 
   // NEXTAUTH_URL 우선, 없으면 Vercel 자동 URL 사용 (VERCEL_URL은 https 없이 제공됨)
-  const baseUrl =
+  const baseUrl = stripBOM(
     process.env.NEXTAUTH_URL ||
-    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000');
+      (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000')
+  );
 
   const params = new URLSearchParams({
-    client_id: process.env.GITHUB_CLIENT_ID!,
+    client_id: stripBOM(process.env.GITHUB_CLIENT_ID!),
     redirect_uri: `${baseUrl}/api/auth/callback`,
     scope: 'repo user:email',
     state,
