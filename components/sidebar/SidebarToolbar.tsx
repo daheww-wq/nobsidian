@@ -1,5 +1,7 @@
 'use client';
 
+import { FolderPlus, FilePlus } from 'lucide-react';
+
 interface SidebarToolbarProps {
   onCreateNote: () => void;
   onCreateFolder: () => void;
@@ -11,17 +13,17 @@ export function SidebarToolbar({ onCreateNote, onCreateFolder }: SidebarToolbarP
       <button
         onClick={onCreateFolder}
         title="새 폴더"
-        className="flex items-center gap-1 rounded-md px-2 py-1 text-xs text-gray-600 hover:bg-gray-100"
+        className="flex items-center gap-1 rounded-md px-2 py-1 text-[11px] text-gray-500 hover:bg-gray-100"
       >
-        <span>📁</span>
+        <FolderPlus size={13} />
         <span>+폴더</span>
       </button>
       <button
         onClick={onCreateNote}
         title="새 노트"
-        className="flex items-center gap-1 rounded-md px-2 py-1 text-xs text-gray-600 hover:bg-gray-100"
+        className="flex items-center gap-1 rounded-md px-2 py-1 text-[11px] text-gray-500 hover:bg-gray-100"
       >
-        <span>📄</span>
+        <FilePlus size={13} />
         <span>+노트</span>
       </button>
     </div>

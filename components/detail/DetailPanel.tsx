@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback, useRef } from 'react';
+import { X } from 'lucide-react';
 import { useEditorStore } from '@/store/editorStore';
 import { useFileTreeStore } from '@/store/fileTreeStore';
 import { toast } from '@/components/ui/Toast';
@@ -133,7 +134,7 @@ export function DetailPanel() {
         <div className="flex shrink-0 items-center justify-between border-b border-gray-100 px-4 py-3">
           <h2 className="text-sm font-semibold">요약 & 태그</h2>
           <button onClick={toggleDetailPanel} className="text-gray-400 hover:text-gray-600">
-            ✕
+            <X size={14} />
           </button>
         </div>
 
@@ -187,7 +188,7 @@ export function DetailPanel() {
                       onClick={() => removeTag(tag)}
                       className="text-gray-400 hover:text-gray-700"
                     >
-                      ×
+                      <X size={10} />
                     </button>
                   </span>
                 ))}

@@ -36,9 +36,9 @@ export function LinkedNotesList() {
           <button
             key={n.path}
             onClick={() => router.push(`/workspace/${btoa(n.path)}`)}
-            className="w-full px-3 py-1.5 text-left hover:bg-gray-50"
+            className="w-full px-3 py-1 text-left hover:bg-gray-50"
           >
-            <p className="truncate text-xs text-green-700">📄 {n.title}</p>
+            <p className="truncate text-[10px] text-gray-600">{n.title}</p>
           </button>
         ))}
       </div>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { X } from 'lucide-react';
 import { useEditorStore } from '@/store/editorStore';
 import { useRepoStore } from '@/store/repoStore';
 import { toast } from '@/components/ui/Toast';
@@ -112,7 +113,7 @@ export function HistoryPanel() {
       <div className="flex items-center justify-between border-b border-gray-100 px-4 py-3">
         <h2 className="text-sm font-semibold">수정 이력</h2>
         <button onClick={toggleHistory} className="text-gray-400 hover:text-gray-600">
-          ✕
+          <X size={14} />
         </button>
       </div>
 

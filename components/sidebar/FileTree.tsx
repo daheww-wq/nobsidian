@@ -153,9 +153,8 @@ export const FileTree = forwardRef<FileTreeHandle>(function FileTree(_props, ref
 
   if (tree.length === 0) {
     return (
-      <div className="flex flex-col items-center gap-2 px-4 py-8 text-center">
-        <span className="text-2xl">📝</span>
-        <p className="text-xs text-gray-500">첫 노트를 만들어보세요!</p>
+      <div className="flex flex-col items-center gap-1 px-4 py-8 text-center">
+        <p className="text-[10px] text-gray-400">첫 노트를 만들어보세요.</p>
       </div>
     );
   }

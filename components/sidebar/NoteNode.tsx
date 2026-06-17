@@ -11,6 +11,7 @@ import { NameInputModal, ConfirmModal } from '@/components/ui/Modal';
 import { toast } from '@/components/ui/Toast';
 import { useRepoStore } from '@/store/repoStore';
 import type { FileTreeNode } from '@/types/note';
+import { FileText } from 'lucide-react';
 
 const INVALID_CHARS = /[<>:"/\\|?*\x00-\x1F]/;
 
@@ -138,8 +139,8 @@ export function NoteNode({ node, depth }: NoteNodeProps) {
         data-testid="file-item"
         ref={setNodeRef}
         style={{ ...style, paddingLeft: `${depth * 12 + 8}px` }}
-        className={`group flex cursor-pointer items-center gap-1.5 rounded-md py-1 pr-2 text-sm select-none ${
-          isActive ? 'bg-green-50 font-medium text-green-800' : 'text-gray-700 hover:bg-gray-100'
+        className={`group flex cursor-pointer items-center gap-1 rounded-md py-0.5 pr-2 text-xs select-none ${
+          isActive ? 'bg-green-50 font-medium text-green-700' : 'text-gray-600 hover:bg-gray-100'
         }`}
         onClick={openNote}
         onContextMenu={handleRightClick}
@@ -153,7 +154,7 @@ export function NoteNode({ node, depth }: NoteNodeProps) {
         >
           ⠿
         </span>
-        <span className="shrink-0 text-base">📄</span>
+        <FileText size={13} className="shrink-0 text-gray-400" />
         <span className="truncate">{node.name.replace(/\.md$/, '')}</span>
       </div>
 

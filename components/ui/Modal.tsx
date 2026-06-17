@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import { X } from 'lucide-react';
 
 interface ModalProps {
   title: string;
@@ -27,7 +28,7 @@ export function Modal({ title, onClose, children }: ModalProps) {
         <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4">
           <h2 className="text-sm font-semibold text-gray-900">{title}</h2>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
-            ✕
+            <X size={14} />
           </button>
         </div>
         <div className="px-5 py-4">{children}</div>

@@ -3,6 +3,7 @@
 import { useState, useCallback, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
+import { X } from 'lucide-react';
 import { useEditorStore } from '@/store/editorStore';
 import { useGraphData } from '@/lib/hooks/useGraphData';
 
@@ -86,7 +87,7 @@ export function GraphPanel() {
               전체 보기 ↗
             </Link>
             <button onClick={toggleGraphPanel} className="text-gray-400 hover:text-gray-600">
-              ✕
+              <X size={14} />
             </button>
           </div>
         </div>
@@ -98,8 +99,7 @@ export function GraphPanel() {
               데이터 로딩 중...
             </div>
           ) : !graphData || graphData.nodes.length === 0 ? (
-            <div className="flex h-full flex-col items-center justify-center gap-2 text-gray-400">
-              <span className="text-2xl">⬡</span>
+            <div className="flex h-full flex-col items-center justify-center gap-2 text-gray-300">
               <p className="text-xs">연결된 노트가 없습니다.</p>
             </div>
           ) : (

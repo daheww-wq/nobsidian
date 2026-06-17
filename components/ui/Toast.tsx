@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { X } from 'lucide-react';
 
 export interface ToastData {
   id: string;
@@ -64,7 +65,7 @@ export function ToastContainer() {
               onClick={() => setToasts((prev) => prev.filter((x) => x.id !== t.id))}
               className="opacity-70 hover:opacity-100"
             >
-              ✕
+              <X size={13} />
             </button>
           </div>
         </div>

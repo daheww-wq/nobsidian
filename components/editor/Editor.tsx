@@ -231,9 +231,8 @@ export function Editor() {
 
   if (!activePath || !frontmatter) {
     return (
-      <div className="flex flex-1 flex-col items-center justify-center text-gray-400">
-        <span className="mb-3 text-4xl">📝</span>
-        <p className="text-sm">노트를 선택하거나 새로 만들어보세요.</p>
+      <div className="flex flex-1 flex-col items-center justify-center text-gray-300">
+        <p className="text-xs">노트를 선택하거나 새로 만들어보세요.</p>
       </div>
     );
   }

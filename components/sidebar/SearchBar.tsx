@@ -1,6 +1,7 @@
 'use client';
 
 import { useRef } from 'react';
+import { Search, X } from 'lucide-react';
 import { useSearchStore } from '@/store/searchStore';
 
 export function SearchBar() {
@@ -17,9 +18,10 @@ export function SearchBar() {
 
   return (
     <div className="relative px-2 py-1.5">
-      <span className="pointer-events-none absolute top-1/2 left-4 -translate-y-1/2 text-xs text-gray-400">
-        🔍
-      </span>
+      <Search
+        size={11}
+        className="pointer-events-none absolute top-1/2 left-4 -translate-y-1/2 text-gray-400"
+      />
       <input
         ref={inputRef}
         type="text"
@@ -39,9 +41,9 @@ export function SearchBar() {
             e.preventDefault();
             clearQuery();
           }}
-          className="absolute top-1/2 right-4 -translate-y-1/2 text-xs text-gray-400 hover:text-gray-600"
+          className="absolute top-1/2 right-4 -translate-y-1/2 text-gray-400 hover:text-gray-600"
         >
-          ✕
+          <X size={11} />
         </button>
       )}
     </div>

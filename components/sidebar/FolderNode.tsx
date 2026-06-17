@@ -10,6 +10,7 @@ import { NameInputModal, ConfirmModal } from '@/components/ui/Modal';
 import { toast } from '@/components/ui/Toast';
 import type { FileTreeNode } from '@/types/note';
 import { NoteNode } from './NoteNode';
+import { Folder, FolderOpen, ChevronRight } from 'lucide-react';
 
 const INVALID_CHARS = /[<>:"/\\|?*\x00-\x1F]/;
 const HOVER_OPEN_DELAY = 800;
@@ -131,8 +132,8 @@ export function FolderNode({ node, depth, onCreateNote, onCreateFolder }: Folder
       <div ref={setNodeRef} style={style}>
         <div
           style={{ paddingLeft: `${depth * 12 + 8}px` }}
-          className={`group flex cursor-pointer items-center gap-1.5 rounded-md py-1 pr-2 text-sm select-none ${
-            isOver ? 'bg-green-50 ring-1 ring-green-400' : 'text-gray-700 hover:bg-gray-100'
+          className={`group flex cursor-pointer items-center gap-1 rounded-md py-0.5 pr-2 text-xs select-none ${
+            isOver ? 'bg-green-50 ring-1 ring-green-400' : 'text-gray-600 hover:bg-gray-100'
           }`}
           onClick={() => toggleExpand(node.path)}
           onContextMenu={handleRightClick}
@@ -145,13 +146,16 @@ export function FolderNode({ node, depth, onCreateNote, onCreateFolder }: Folder
           >
             ⠿
           </span>
-          <span
-            className="shrink-0 text-xs text-gray-400 transition-transform"
+          <ChevronRight
+            size={11}
+            className="shrink-0 text-gray-400 transition-transform"
             style={{ transform: isExpanded ? 'rotate(90deg)' : '' }}
-          >
-            ▶
-          </span>
-          <span className="shrink-0 text-base">{isExpanded ? '📂' : '📁'}</span>
+          />
+          {isExpanded ? (
+            <FolderOpen size={13} className="shrink-0 text-gray-400" />
+          ) : (
+            <Folder size={13} className="shrink-0 text-gray-400" />
+          )}
           <span className="truncate">{node.name}</span>
         </div>
 

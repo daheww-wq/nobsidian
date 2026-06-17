@@ -26,13 +26,13 @@ export function Sidebar() {
         onCreateFolder={() => fileTreeRef.current?.openCreate('folder')}
       />
 
-      {/* 현재 노트 경로 — 폴더 아이템과 동일한 크기(py-1 text-sm) */}
+      {/* 현재 노트 경로 */}
       {activePath && (
         <div
-          className="truncate border-b border-gray-100 px-2 py-1 text-sm text-gray-400"
+          className="truncate border-b border-gray-100 px-2 py-0.5 text-[10px] text-gray-400"
           title={activePath}
         >
-          📄 {activePath}
+          {activePath}
         </div>
       )}
 

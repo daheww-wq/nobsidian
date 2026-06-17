@@ -19,12 +19,7 @@ export function StatusBar() {
             {wordCount}단어 · {charCount}자
           </span>
         )}
-        {selectedRepo && (
-          <span>
-            <span className="mr-1">📦</span>
-            {selectedRepo.full_name}
-          </span>
-        )}
+        {selectedRepo && <span>{selectedRepo.full_name}</span>}
       </div>
     </div>
   );
