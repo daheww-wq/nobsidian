@@ -25,6 +25,7 @@ export function Editor() {
     frontmatter,
     markdownBody,
     saveStatus,
+    restoreKey,
     setMarkdownBody,
     setSaveStatus,
     setSha,
@@ -58,7 +59,10 @@ export function Editor() {
 
   const triggerSave = useCallback(
     async (isManual: boolean) => {
-      if (!activePath || !activeSha || !frontmatter || !selectedRepo) return;
+      if (!activePath || !frontmatter || !selectedRepo) return;
+      // 항상 스토어에서 최신 SHA 읽기 — 클로저 stale 방지
+      const sha = useEditorStore.getState().activeSha;
+      if (!sha) return;
       if (!isOnline) {
         setSaveStatus('offline');
         return;
@@ -80,7 +84,7 @@ export function Editor() {
             repo: selectedRepo.name,
             path: activePath,
             content,
-            sha: activeSha,
+            sha,
             isManual,
           }),
         });
@@ -110,7 +114,6 @@ export function Editor() {
     },
     [
       activePath,
-      activeSha,
       frontmatter,
       markdownBody,
       selectedRepo,
@@ -217,6 +220,7 @@ export function Editor() {
         <div className="mx-auto max-w-[960px] px-20 py-12">
           <NoteTitle value={frontmatter.title} onChange={handleTitleChange} />
           <BlockNoteEditor
+            key={restoreKey}
             initialMarkdown={markdownBody}
             onChange={handleBodyChange}
             notePath={activePath}

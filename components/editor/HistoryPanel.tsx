@@ -99,7 +99,7 @@ export function HistoryPanel() {
       if (!res.ok) throw new Error();
       const data = (await res.json()) as { content: string; sha: string };
       const { frontmatter, body } = parseFrontmatter(data.content);
-      useEditorStore.getState().setActiveNote(activePath, data.sha, frontmatter, body);
+      useEditorStore.getState().restoreNote(activePath, data.sha, frontmatter, body);
       toast({ type: 'success', message: '버전이 복원되었습니다.' });
       toggleHistory();
     } catch {

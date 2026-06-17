@@ -11,8 +11,10 @@ interface EditorState {
   saveStatus: SaveStatus;
   isDetailPanelOpen: boolean;
   isHistoryOpen: boolean;
+  restoreKey: number;
 
   setActiveNote: (path: string, sha: string, fm: NoteFrontmatter, body: string) => void;
+  restoreNote: (path: string, sha: string, fm: NoteFrontmatter, body: string) => void;
   setMarkdownBody: (body: string) => void;
   setSaveStatus: (s: SaveStatus) => void;
   setSha: (sha: string) => void;
@@ -30,6 +32,7 @@ export const useEditorStore = create<EditorState>((set) => ({
   saveStatus: 'saved',
   isDetailPanelOpen: false,
   isHistoryOpen: false,
+  restoreKey: 0,
 
   setActiveNote: (path, sha, fm, body) =>
     set({
@@ -39,6 +42,16 @@ export const useEditorStore = create<EditorState>((set) => ({
       markdownBody: body,
       saveStatus: 'saved',
     }),
+
+  restoreNote: (path, sha, fm, body) =>
+    set((s) => ({
+      activePath: path,
+      activeSha: sha,
+      frontmatter: fm,
+      markdownBody: body,
+      saveStatus: 'saved',
+      restoreKey: s.restoreKey + 1,
+    })),
 
   setMarkdownBody: (body) => set({ markdownBody: body, saveStatus: 'unsaved' }),
 

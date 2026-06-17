@@ -53,8 +53,13 @@ export const FileTree = forwardRef<FileTreeHandle>(function FileTree(_props, ref
       const srcPath = active.id as string;
       const dstPath = over.id as string;
 
-      const dstNode = findNode(tree, dstPath);
-      if (dstNode?.type !== 'folder') return;
+      let dstNode = findNode(tree, dstPath);
+      // 드롭 대상이 파일이면 부모 폴더로 fallback (폴더 하단 드롭 시 파일이 잡히는 경우)
+      if (dstNode?.type !== 'folder') {
+        const parentPath = dstPath.includes('/') ? dstPath.split('/').slice(0, -1).join('/') : null;
+        dstNode = parentPath ? findNode(tree, parentPath) : null;
+        if (!dstNode || dstNode.type !== 'folder') return;
+      }
 
       const srcNode = findNode(tree, srcPath);
       if (!srcNode) return;
