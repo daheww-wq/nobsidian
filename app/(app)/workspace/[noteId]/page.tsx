@@ -10,6 +10,7 @@ import { Editor } from '@/components/editor/Editor';
 import { HistoryPanel } from '@/components/editor/HistoryPanel';
 import { EditorSkeleton } from '@/components/ui/Skeleton';
 import { toast } from '@/components/ui/Toast';
+import { noteCache } from '@/lib/cache/noteCache';
 import { useState } from 'react';
 
 export default function NotePage({ params }: { params: Promise<{ noteId: string }> }) {
@@ -35,6 +36,26 @@ export default function NotePage({ params }: { params: Promise<{ noteId: string 
   useEffect(() => {
     if (!path || !selectedRepo) return;
     let cancelled = false;
+
+    // 캐시 히트 시 즉시 표시 후 백그라운드에서 신선도 확인
+    const cached = noteCache.get(path);
+    if (cached) {
+      const { frontmatter, body } = parseFrontmatter(cached.content);
+      setActiveNote(path, cached.sha, frontmatter, body);
+      setTreeActive(path);
+      addToIndex({
+        path,
+        title: frontmatter.title || path.split('/').pop()?.replace(/\.md$/, '') || path,
+        tags: frontmatter.tags ?? [],
+        body,
+        updatedAt: frontmatter.updated ?? '',
+      });
+      // Promise.resolve()로 마이크로태스크로 미뤄 set-state-in-effect 방지
+      Promise.resolve().then(() => {
+        if (!cancelled) setLoadedPath(path);
+      });
+    }
+
     const owner = selectedRepo.full_name.split('/')[0];
 
     fetch(
@@ -46,6 +67,7 @@ export default function NotePage({ params }: { params: Promise<{ noteId: string 
       })
       .then((data: { content: string; sha: string }) => {
         if (cancelled) return;
+        noteCache.set(path, data.content, data.sha);
         const { frontmatter, body } = parseFrontmatter(data.content);
         setActiveNote(path, data.sha, frontmatter, body);
         setTreeActive(path);
@@ -56,16 +78,18 @@ export default function NotePage({ params }: { params: Promise<{ noteId: string 
           body,
           updatedAt: frontmatter.updated ?? '',
         });
-        setLoadedPath(path); // ← setState in callback, not in effect body
+        setLoadedPath(path);
       })
       .catch(() => {
         if (cancelled) return;
-        toast({
-          type: 'error',
-          message: '노트를 불러올 수 없습니다.',
-          action: { label: '재시도', onClick: () => window.location.reload() },
-        });
-        setLoadedPath(path); // 에러 시에도 스켈레톤 해제
+        if (!cached) {
+          toast({
+            type: 'error',
+            message: '노트를 불러올 수 없습니다.',
+            action: { label: '재시도', onClick: () => window.location.reload() },
+          });
+          setLoadedPath(path);
+        }
       });
 
     return () => {

@@ -6,6 +6,7 @@ import { useEditorStore } from '@/store/editorStore';
 import { useRepoStore } from '@/store/repoStore';
 import { serializeFrontmatter } from '@/lib/markdown/frontmatter';
 import { SaveQueue } from '@/lib/editor/saveQueue';
+import { noteCache } from '@/lib/cache/noteCache';
 import { toast } from '@/components/ui/Toast';
 import { EditorSkeleton } from '@/components/ui/Skeleton';
 import { NoteTitle } from './NoteTitle';
@@ -21,7 +22,6 @@ const AUTOSAVE_DELAY = 2000;
 export function Editor() {
   const {
     activePath,
-    activeSha,
     frontmatter,
     markdownBody,
     saveStatus,
@@ -102,6 +102,7 @@ export function Editor() {
         const data = (await res.json()) as { sha: string };
         setSha(data.sha);
         setSaveStatus('saved');
+        noteCache.set(activePath, content, data.sha);
       } catch {
         setSaveStatus('error');
         // triggerSaveRef를 통해 최신 triggerSave 참조 — 재시도 버튼 복원
