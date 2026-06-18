@@ -80,6 +80,9 @@ export function Editor() {
 
       if (isManual) void saveQueueRef.current?.flush();
 
+      // fetch 시작 전에 경로 캡처 — 비동기 완료 후 노트가 바뀌어도 다른 노트의 SHA 오염 방지
+      const savedPath = activePath;
+
       try {
         const res = await fetch('/api/notes/save', {
           method: 'POST',
@@ -87,7 +90,7 @@ export function Editor() {
           body: JSON.stringify({
             owner,
             repo: selectedRepo.name,
-            path: activePath,
+            path: savedPath,
             content,
             sha,
             isManual,
@@ -95,6 +98,8 @@ export function Editor() {
         });
 
         if (res.status === 409) {
+          // 이미 다른 노트로 이동했으면 409 토스트 무시
+          if (useEditorStore.getState().activePath !== savedPath) return;
           setSaveStatus('error');
           toast({
             type: 'error',
@@ -105,9 +110,11 @@ export function Editor() {
         }
         if (!res.ok) throw new Error();
         const data = (await res.json()) as { sha: string };
+        // 저장 완료 시점에도 여전히 같은 노트인 경우에만 SHA·상태 업데이트
+        noteCache.set(savedPath, content, data.sha);
+        if (useEditorStore.getState().activePath !== savedPath) return;
         setSha(data.sha);
         setSaveStatus('saved');
-        noteCache.set(activePath, content, data.sha);
       } catch {
         setSaveStatus('error');
         toast({

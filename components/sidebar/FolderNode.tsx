@@ -132,7 +132,7 @@ export function FolderNode({ node, depth, onCreateNote, onCreateFolder }: Folder
       <div ref={setNodeRef} style={style}>
         <div
           style={{ paddingLeft: `${depth * 12 + 8}px` }}
-          className={`group flex cursor-pointer items-center gap-1 rounded-md py-0.5 pr-2 text-xs font-medium select-none ${
+          className={`group flex cursor-pointer items-center gap-1 rounded-md py-0.5 pr-2 text-sm font-bold select-none ${
             isOver
               ? 'bg-green-50 ring-1 ring-green-400'
               : 'bg-gray-50 text-gray-700 hover:bg-gray-100'

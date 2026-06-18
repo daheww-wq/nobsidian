@@ -22,7 +22,7 @@ interface NoteNodeProps {
 
 export function NoteNode({ node, depth }: NoteNodeProps) {
   const router = useRouter();
-  const { activeNotePath, setActiveNote, removeNode, renameNode } = useFileTreeStore();
+  const { activeNotePath, setActiveNote, removeNode, renameNode, failedPaths } = useFileTreeStore();
   const { activePath, saveStatus } = useEditorStore();
   const { selectedRepo } = useRepoStore();
   const [menu, setMenu] = useState<{ x: number; y: number } | null>(null);
@@ -39,6 +39,7 @@ export function NoteNode({ node, depth }: NoteNodeProps) {
   };
 
   const isActive = activeNotePath === node.path;
+  const isFailed = failedPaths.has(node.path);
 
   const openNote = useCallback(() => {
     if (saveStatus === 'unsaved') {
@@ -139,10 +140,14 @@ export function NoteNode({ node, depth }: NoteNodeProps) {
         data-testid="file-item"
         ref={setNodeRef}
         style={{ ...style, paddingLeft: `${depth * 12 + 8}px` }}
-        className={`group flex cursor-pointer items-center gap-1 rounded-md py-0.5 pr-2 text-xs select-none ${
-          isActive ? 'bg-green-50 font-medium text-green-700' : 'text-gray-600 hover:bg-gray-100'
+        className={`group flex items-center gap-1 rounded-md py-0.5 pr-2 text-xs select-none ${
+          isFailed
+            ? 'cursor-not-allowed text-gray-300'
+            : isActive
+              ? 'cursor-pointer bg-green-50 font-medium text-green-700'
+              : 'cursor-pointer text-gray-600 hover:bg-gray-100'
         }`}
-        onClick={openNote}
+        onClick={isFailed ? undefined : openNote}
         onContextMenu={handleRightClick}
       >
         {/* Drag handle */}
@@ -154,8 +159,13 @@ export function NoteNode({ node, depth }: NoteNodeProps) {
         >
           ⠿
         </span>
-        <FileText size={13} className="shrink-0 text-gray-400" />
-        <span className="truncate">{node.name.replace(/\.md$/, '')}</span>
+        <FileText
+          size={13}
+          className={`shrink-0 ${isFailed ? 'text-gray-300' : 'text-gray-400'}`}
+        />
+        <span className={`truncate ${isFailed ? 'line-through' : ''}`}>
+          {node.name.replace(/\.md$/, '')}
+        </span>
       </div>
 
       {menu && (

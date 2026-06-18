@@ -20,7 +20,7 @@ export default function WorkspaceLayout({ children }: { children: React.ReactNod
   const router = useRouter();
   const { fetchSession } = useAuthStore();
   const { selectedRepo } = useRepoStore();
-  const { setTree, setLoading } = useFileTreeStore();
+  const { setTree, resetTree, setLoading } = useFileTreeStore();
   const { addToIndex, clearIndex } = useSearchStore();
   const { clearEditor } = useEditorStore();
   // 최초 마운트는 초기화 건너뜀 — 레포 변경 시에만 초기화
@@ -36,15 +36,18 @@ export default function WorkspaceLayout({ children }: { children: React.ReactNod
       return;
     }
 
-    // 레포가 바뀌었을 때만 에디터·캐시·검색 초기화
     const repoKey = selectedRepo.full_name;
-    if (prevRepoRef.current !== null && prevRepoRef.current !== repoKey) {
+    const repoChanged = prevRepoRef.current !== null && prevRepoRef.current !== repoKey;
+
+    if (repoChanged) {
       clearEditor();
-      clearIndex();
       noteCache.clearAll();
     }
     prevRepoRef.current = repoKey;
 
+    // 항상 트리·인덱스 초기화 후 fetch (마운트 직후 또는 레포 전환 모두 커버)
+    resetTree();
+    clearIndex();
     const owner = selectedRepo.full_name.split('/')[0];
     setLoading(true);
 
@@ -68,7 +71,7 @@ export default function WorkspaceLayout({ children }: { children: React.ReactNod
       })
       .catch(() => {})
       .finally(() => setLoading(false));
-  }, [selectedRepo, router, setLoading, setTree, addToIndex, clearEditor, clearIndex]);
+  }, [selectedRepo, router, setLoading, setTree, resetTree, addToIndex, clearEditor, clearIndex]);
 
   return (
     <div className="flex h-screen flex-col overflow-hidden">

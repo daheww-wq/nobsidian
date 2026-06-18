@@ -17,7 +17,7 @@ export default function NotePage({ params }: { params: Promise<{ noteId: string 
   const { noteId } = use(params);
   const { setActiveNote, isHistoryOpen } = useEditorStore();
   const { selectedRepo } = useRepoStore();
-  const { setActiveNote: setTreeActive } = useFileTreeStore();
+  const { setActiveNote: setTreeActive, markFailed } = useFileTreeStore();
   const { addToIndex } = useSearchStore();
 
   // 어떤 경로가 로드됐는지 추적 → isLoading을 파생값으로 만들어 set-state-in-effect 방지
@@ -40,7 +40,7 @@ export default function NotePage({ params }: { params: Promise<{ noteId: string 
     // 캐시 히트 시 즉시 표시 후 백그라운드에서 신선도 확인
     const cached = noteCache.get(path);
     if (cached) {
-      const { frontmatter, body } = parseFrontmatter(cached.content);
+      const { frontmatter, body } = parseFrontmatter(cached.content, path);
       setActiveNote(path, cached.sha, frontmatter, body);
       setTreeActive(path);
       addToIndex({
@@ -68,7 +68,7 @@ export default function NotePage({ params }: { params: Promise<{ noteId: string 
       .then((data: { content: string; sha: string }) => {
         if (cancelled) return;
         noteCache.set(path, data.content, data.sha);
-        const { frontmatter, body } = parseFrontmatter(data.content);
+        const { frontmatter, body } = parseFrontmatter(data.content, path);
         setActiveNote(path, data.sha, frontmatter, body);
         setTreeActive(path);
         addToIndex({
@@ -83,6 +83,7 @@ export default function NotePage({ params }: { params: Promise<{ noteId: string 
       .catch(() => {
         if (cancelled) return;
         if (!cached) {
+          markFailed(path);
           toast({
             type: 'error',
             message: '노트를 불러올 수 없습니다.',

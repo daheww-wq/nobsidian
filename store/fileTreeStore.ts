@@ -6,9 +6,12 @@ interface FileTreeState {
   expandedPaths: Set<string>;
   activeNotePath: string | null;
   isLoading: boolean;
+  failedPaths: Set<string>;
 
   setTree: (tree: FileTreeNode[]) => void;
+  resetTree: () => void;
   setLoading: (v: boolean) => void;
+  markFailed: (path: string) => void;
   toggleExpand: (path: string) => void;
   setExpanded: (path: string, expanded: boolean) => void;
   setActiveNote: (path: string | null) => void;
@@ -63,9 +66,13 @@ export const useFileTreeStore = create<FileTreeState>((set) => ({
   expandedPaths: new Set(),
   activeNotePath: null,
   isLoading: false,
+  failedPaths: new Set(),
 
   setTree: (tree) => set({ tree }),
+  resetTree: () =>
+    set({ tree: [], expandedPaths: new Set(), activeNotePath: null, failedPaths: new Set() }),
   setLoading: (v) => set({ isLoading: v }),
+  markFailed: (path) => set((s) => ({ failedPaths: new Set([...s.failedPaths, path]) })),
 
   toggleExpand: (path) =>
     set((s) => {
