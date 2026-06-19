@@ -11,7 +11,9 @@
     "prepare": "husky",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
-    "test:e2e:headed": "playwright test --headed"
+    "test:e2e:headed": "playwright test --headed",
+    "agents": "ts-node scripts/run-agents.ts",
+    "agents:qa": "ts-node scripts/run-agents.ts --qa-only"
   },
   "lint-staged": {
     "*.{ts,tsx,js,jsx}": [
@@ -45,6 +47,7 @@
     "zustand": "^5.0.14"
   },
   "devDependencies": {
+    "@anthropic-ai/sdk": "^0.105.0",
     "@playwright/test": "^1.61.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
