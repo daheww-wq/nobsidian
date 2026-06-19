@@ -49,9 +49,9 @@ body {
 }
 
 /* 인라인 코드 — 배경만, 테두리 없음 */
-.bn-editor code {
+.bn-editor .bn-inline-content code {
   font-family: 'Menlo', 'Monaco', 'Consolas', 'Liberation Mono', monospace !important;
-  font-size: 0.9em !important;
+  font-size: var(--editor-font-size, 12px) !important;
   background-color: #f0f2f5 !important;
   border: none !important;
   border-radius: 3px !important;
@@ -59,28 +59,32 @@ body {
   color: #24292e !important;
 }
 
-/* 코드블록: 해당 요소 및 모든 자식의 border·outline·box-shadow 완전 제거 */
-.bn-editor [data-content-type='codeBlock'],
-.bn-editor [data-content-type='codeBlock'] *,
-.bn-editor pre,
-.bn-editor pre *,
-.bn-editor .bn-code-block,
-.bn-editor .bn-code-block * {
+/* 코드블록 컨테이너 — BlockNote 다크 배경 완전 제거 */
+.bn-block-content[data-content-type='codeBlock'] {
+  background-color: #f6f8fa !important;
+  color: #24292e !important;
+  border-radius: 6px !important;
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+/* 코드블록 내부 pre — 폰트·여백·크기 */
+.bn-block-content[data-content-type='codeBlock'] > pre {
+  font-family: 'Menlo', 'Monaco', 'Consolas', 'Liberation Mono', monospace !important;
+  font-size: var(--editor-font-size, 12px) !important;
+  line-height: 1.65 !important;
+  white-space: pre-wrap !important;
+  padding: 10px 14px !important;
+  margin: 0 !important;
+  background-color: #f6f8fa !important;
+  color: #24292e !important;
+  border: none !important;
+}
+
+/* 코드블록 내 모든 자식 — border/outline 초기화 */
+.bn-block-content[data-content-type='codeBlock'] * {
   border: none !important;
   outline: none !important;
   box-shadow: none !important;
-}
-
-/* 코드블록 요소 공통 스타일 */
-.bn-editor [data-content-type='codeBlock'],
-.bn-editor pre,
-.bn-editor .bn-code-block {
-  font-family: 'Menlo', 'Monaco', 'Consolas', 'Liberation Mono', monospace !important;
-  font-size: 0.88em !important;
-  background-color: #f6f8fa !important;
-  color: #24292e !important;
-  line-height: 1.6 !important;
-  white-space: pre-wrap !important;
-  border-radius: 4px !important;
-  padding: 2px 6px !important;
 }
